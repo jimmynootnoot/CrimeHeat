@@ -1,0 +1,6 @@
+incident_id,crime_type,incident_date,incident_time,municipality,barangay,general_location,latitude,longitude,coordinate_source,coordinate_precision,reporting_station,case_status_generalized,offense_code,notes_non_sensitive
+PPALMA-2024-0001,Theft,2024-01-15,14:30,Midsayap,Poblacion 1,Near the public market,7.187654,124.531234,reported,exact,Midsayap MPS,under_investigation,RA10951,Daytime incident
+PPALMA-2024-0002,Physical Injury,2024-02-03,21:05,Pikit,Poblacion,Along the national highway,7.041233,124.665412,reported,exact,Pikit MPS,filed_in_court,,
+PPALMA-2024-0003,Robbery,2024-02-19,,Pigcawayan,Poblacion,Near the transport terminal,7.311204,124.436781,geocoded,approximate,Pigcawayan MPS,solved,,Coordinates derived from location description
+PPALMA-2024-0004,Carnapping,2024-03-08,03:45,Alamada,Poblacion,Along a farm-to-market road,7.402113,124.560987,reported,exact,Alamada MPS,under_investigation,RA10883,
+PPALMA-2024-0005,Cattle Rustling,2024-03-22,,Libungan,Poblacion,Near an irrigation canal road,7.253410,124.510223,barangay_centroid,barangay_level,Libungan MPS,under_investigation,PD533,Exact site not recorded
