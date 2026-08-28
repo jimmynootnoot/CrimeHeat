@@ -1,0 +1,228 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="2.5.1 Context Diagram" id="context1">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="ctx_analyst" value="Analyst" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="140" width="50" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ctx_admin" value="Admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="540" width="50" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ctx_sys" value="PPALMA Crime&#10;Mapping Tool" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="500" y="330" width="260" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="ctx_pnp" value="PNP / LGU Crime&#10;Records Source&#10;(synthetic in dev)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="960" y="140" width="220" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="ctx_osm" value="OpenStreetMap&#10;Tile Server" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="960" y="540" width="220" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ctx_e1" value="login, queries //&#10;dashboards, maps, records, reports" style="html=1;endArrow=classic;startArrow=classic;rounded=0;fontSize=10;" edge="1" parent="1" source="ctx_analyst" target="ctx_sys">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ctx_e2" value="login, uploads, commit/delete //&#10;results, confirmations" style="html=1;endArrow=classic;startArrow=classic;rounded=0;fontSize=10;" edge="1" parent="1" source="ctx_admin" target="ctx_sys">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ctx_e3" value="raw incident data (import)" style="html=1;endArrow=classic;startArrow=none;rounded=0;fontSize=10;" edge="1" parent="1" source="ctx_pnp" target="ctx_sys">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ctx_e4" value="tile requests //&#10;tile images" style="html=1;endArrow=classic;startArrow=classic;rounded=0;fontSize=10;" edge="1" parent="1" source="ctx_sys" target="ctx_osm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram name="2.5.2 Use Case Diagram" id="usecase1">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="1050" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="uc_analyst" value="Analyst" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="60" y="380" width="60" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="uc_admin" value="Admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="60" y="700" width="60" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc_boundary" value="PPALMA Crime Mapping Tool" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;verticalAlign=top;align=center;fontStyle=1;fontSize=16;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="260" y="40" width="1400" height="1000" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pkg_auth" value="Authentication" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;dashed=1;verticalAlign=top;align=left;spacingLeft=8;spacingTop=6;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="70" width="760" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg_dash" value="Dashboard &amp; Reports" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;dashed=1;verticalAlign=top;align=left;spacingLeft=8;spacingTop=6;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="240" width="760" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg_map" value="Map Visualization" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;dashed=1;verticalAlign=top;align=left;spacingLeft=8;spacingTop=6;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="400" width="760" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg_rec" value="Records Management" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;dashed=1;verticalAlign=top;align=left;spacingLeft=8;spacingTop=6;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="640" width="760" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="pkg_up" value="Data Import" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;dashed=1;verticalAlign=top;align=left;spacingLeft=8;spacingTop=6;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="800" width="760" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="oc_login" value="Login" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="320" y="120" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="oc_register" value="Register Account" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="480" y="120" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="oc_logout" value="Logout" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="650" y="120" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="oc_profile" value="View Own Profile" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="790" y="120" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="oc_dash" value="View Dashboard Summary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="320" y="290" width="190" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="oc_munistat" value="View Municipality Statistics" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="540" y="290" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="oc_reports" value="View Reports" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="770" y="290" width="150" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="oc_map" value="View Map" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="320" y="490" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="oc_filter" value="Filter Map Data" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="500" y="430" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="oc_cluster" value="View Cluster Details" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="500" y="490" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="oc_persist" value="View Persistence Details" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="500" y="550" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="oc_records" value="View Incident Records" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="320" y="690" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="oc_delete" value="Delete Incident Record" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="820" y="690" width="190" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="oc_import" value="Import Crime Data" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="320" y="870" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="oc_preview" value="Preview Upload" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="520" y="840" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="oc_validate" value="Validate Upload" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="520" y="900" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="oc_commit" value="Commit Upload" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="820" y="870" width="150" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="gen1" value="" style="html=1;endArrow=block;endFill=0;startArrow=none;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="uc_admin" target="uc_analyst">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="a1" style="html=1;endArrow=none;startArrow=none;rounded=0;exitX=1;exitY=0.3;entryX=0;entryY=0.5;" edge="1" parent="1" source="uc_analyst" target="oc_login"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a2" style="html=1;endArrow=none;startArrow=none;rounded=0;exitX=1;exitY=0.32;entryX=0;entryY=0.5;" edge="1" parent="1" source="uc_analyst" target="oc_register"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a3" style="html=1;endArrow=none;startArrow=none;rounded=0;exitX=1;exitY=0.34;entryX=0;entryY=0.5;" edge="1" parent="1" source="uc_analyst" target="oc_logout"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a4" style="html=1;endArrow=none;startArrow=none;rounded=0;exitX=1;exitY=0.36;entryX=0;entryY=0.5;" edge="1" parent="1" source="uc_analyst" target="oc_profile"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a5" style="html=1;endArrow=none;startArrow=none;rounded=0;exitX=1;exitY=0.42;entryX=0;entryY=0.5;" edge="1" parent="1" source="uc_analyst" target="oc_dash"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a6" style="html=1;endArrow=none;startArrow=none;rounded=0;exitX=1;exitY=0.44;entryX=0;entryY=0.5;" edge="1" parent="1" source="uc_analyst" target="oc_munistat"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a7" style="html=1;endArrow=none;startArrow=none;rounded=0;exitX=1;exitY=0.46;entryX=0;entryY=0.5;" edge="1" parent="1" source="uc_analyst" target="oc_reports"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a8" style="html=1;endArrow=none;startArrow=none;rounded=0;exitX=1;exitY=0.55;entryX=0;entryY=0.5;" edge="1" parent="1" source="uc_analyst" target="oc_map"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a9" style="html=1;endArrow=none;startArrow=none;rounded=0;exitX=1;exitY=0.7;entryX=0;entryY=0.5;" edge="1" parent="1" source="uc_analyst" target="oc_records"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a10" style="html=1;endArrow=none;startArrow=none;rounded=0;exitX=1;exitY=0.85;entryX=0;entryY=0.5;" edge="1" parent="1" source="uc_analyst" target="oc_import"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="inc1" value="&lt;&lt;include&gt;&gt;" style="html=1;endArrow=open;endFill=0;dashed=1;rounded=0;fontSize=10;exitX=1;exitY=0.4;entryX=0;entryY=0.5;" edge="1" parent="1" source="oc_map" target="oc_filter"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ext1" value="&lt;&lt;extend&gt;&gt;" style="html=1;endArrow=open;endFill=0;dashed=1;rounded=0;fontSize=10;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="oc_map" target="oc_cluster"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ext2" value="&lt;&lt;extend&gt;&gt;" style="html=1;endArrow=open;endFill=0;dashed=1;rounded=0;fontSize=10;exitX=1;exitY=0.6;entryX=0;entryY=0.5;" edge="1" parent="1" source="oc_map" target="oc_persist"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="inc2" value="&lt;&lt;include&gt;&gt;" style="html=1;endArrow=open;endFill=0;dashed=1;rounded=0;fontSize=10;exitX=1;exitY=0.4;entryX=0;entryY=0.5;" edge="1" parent="1" source="oc_import" target="oc_preview"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="inc3" value="&lt;&lt;include&gt;&gt;" style="html=1;endArrow=open;endFill=0;dashed=1;rounded=0;fontSize=10;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="oc_preview" target="oc_validate"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="inc4" value="&lt;&lt;include&gt;&gt;" style="html=1;endArrow=open;endFill=0;dashed=1;rounded=0;fontSize=10;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" edge="1" parent="1" source="oc_commit" target="oc_validate"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="adm1" style="html=1;endArrow=none;startArrow=none;rounded=0;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=1;entryY=0.5;" edge="1" parent="1" source="uc_admin" target="oc_delete">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="90" y="1010" />
+              <mxPoint x="1600" y="1010" />
+              <mxPoint x="1600" y="715" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="adm2" style="html=1;endArrow=none;startArrow=none;rounded=0;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=1;entryY=0.5;" edge="1" parent="1" source="uc_admin" target="oc_commit">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="90" y="1010" />
+              <mxPoint x="1620" y="1010" />
+              <mxPoint x="1620" y="895" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram name="2.5.3 Architecture Diagram" id="arch1">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="950" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="ar_pres" value="Presentation Layer &#8212; Browser Client&#10;(React + Vite + TypeScript + Tailwind CSS)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;fontStyle=1;fontSize=13;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="180" y="60" width="620" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="ar_pages" value="Pages&#10;Login, Dashboard, Map,&#10;Upload, Records, Reports" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="210" y="110" width="190" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ar_mapc" value="Map Components (React-Leaflet)&#10;Boundary / Incident / Cluster /&#10;Persistence / Heatmap layers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="430" y="110" width="220" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ar_axios" value="Axios API Client" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="320" y="240" width="220" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ar_osm" value="OpenStreetMap&#10;Tile Server&#10;(external service)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="900" y="100" width="200" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ar_app" value="Application Layer &#8212; FastAPI Backend" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;fontStyle=1;fontSize=13;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="180" y="380" width="620" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="ar_routes" value="Routes&#10;auth, municipalities, incidents,&#10;upload, clusters, persistence,&#10;reports, dashboard" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="210" y="430" width="190" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="ar_core" value="Core (cross-cutting)&#10;JWT + bcrypt auth,&#10;RBAC require_role" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="430" y="430" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ar_services" value="Services&#10;import_service, clustering (DBSCAN),&#10;persistence_service, audit_service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="430" y="510" width="330" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ar_data" value="Data Layer" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;verticalAlign=top;fontStyle=1;fontSize=13;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="180" y="700" width="620" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="ar_db" value="PostgreSQL + PostGIS&#10;via SQLAlchemy + GeoAlchemy2 ORM&#10;(Users/Roles, Municipalities/Barangays,&#10;Incidents, ImportBatch/Dataset,&#10;Clusters, Persistence, ReferenceHotspot)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffffff;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="290" y="740" width="400" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ar_e1" style="html=1;endArrow=none;startArrow=none;rounded=0;" edge="1" parent="1" source="ar_pages" target="ar_axios"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ar_e2" style="html=1;endArrow=none;startArrow=none;rounded=0;" edge="1" parent="1" source="ar_mapc" target="ar_axios"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="ar_e3" value="REST / JSON over HTTPS" style="html=1;endArrow=classic;startArrow=classic;rounded=0;fontSize=10;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="ar_pres" target="ar_app"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ar_e4" value="SQL" style="html=1;endArrow=classic;startArrow=classic;rounded=0;fontSize=10;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="ar_app" target="ar_data"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ar_e5" value="tile requests / tile images" style="html=1;endArrow=classic;startArrow=classic;rounded=0;fontSize=10;" edge="1" parent="1" source="ar_mapc" target="ar_osm"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ar_e6" style="html=1;endArrow=none;startArrow=none;rounded=0;" edge="1" parent="1" source="ar_routes" target="ar_core"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ar_e7" style="html=1;endArrow=open;endFill=0;rounded=0;" edge="1" parent="1" source="ar_routes" target="ar_services"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
