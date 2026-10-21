@@ -5,6 +5,7 @@ import type {
   IncidentFilters,
   MunicipalityStats,
 } from '../types';
+import type { UserRole } from '../types';
 import type { FeatureCollection } from 'geojson';
 
 export type MetaFeatureCollection = FeatureCollection & { metadata?: AnalysisMetadata };
@@ -259,6 +260,27 @@ export function downloadCsvText(content: string, filename: string) {
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+export interface ManagedUser {
+  id: number;
+  email: string;
+  role: UserRole;
+  created_at: string | null;
+}
+
+export async function fetchUsers(): Promise<ManagedUser[]> {
+  const res = await apiClient.get('/api/auth/users');
+  return res.data;
+}
+
+export async function createUserAccount(payload: {
+  email: string;
+  password: string;
+  role: UserRole;
+}): Promise<ManagedUser> {
+  const res = await apiClient.post('/api/auth/users', payload);
+  return res.data;
 }
 
 export async function openHtmlReport(filters: IncidentFilters): Promise<void> {

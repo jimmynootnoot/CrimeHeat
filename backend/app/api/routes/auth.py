@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.api.deps import ADMIN_ONLY, ALL_ROLES, get_current_user, require_role
@@ -9,6 +10,29 @@ from app.models.user import User
 from app.services import audit_service
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
+
+
+class UserCreate(BaseModel):
+    email: str = Field(min_length=3, max_length=255)
+    password: str = Field(min_length=8, max_length=128)
+    role: str = "viewer"
+
+
+def _create_user(db: Session, email: str, password: str, role: str) -> User:
+    email = email.strip().lower()
+    if role not in ALL_ROLES:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            f"Unknown role '{role}'. Valid roles: {', '.join(ALL_ROLES)}",
+        )
+    if db.query(User).filter(User.email == email).first():
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Email already registered")
+
+    user = User(email=email, password_hash=hash_password(password), role=role)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
 
 
 @router.post("/login")
@@ -74,20 +98,10 @@ def register(
     anyone provision themselves access. Accounts default to the least
     privileged role and must be upgraded explicitly.
     """
-    if role not in ALL_ROLES:
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST,
-            f"Unknown role '{role}'. Valid roles: {', '.join(ALL_ROLES)}",
-        )
-    if db.query(User).filter(User.email == email).first():
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Email already registered")
     if len(password) < 8:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Password must be at least 8 characters")
 
-    user = User(email=email, password_hash=hash_password(password), role=role)
-    db.add(user)
-    db.commit()
-    db.refresh(user)
+    user = _create_user(db, email, password, role)
 
     audit_service.record(
         db,
@@ -99,3 +113,42 @@ def register(
         request=request,
     )
     return {"id": user.id, "email": user.email, "role": user.role}
+
+
+@router.get("/users")
+def list_users(
+    db: Session = Depends(get_db),
+    _actor: User = Depends(require_role(*ADMIN_ONLY)),
+):
+    """List accounts for the administrator's user-management screen."""
+    users = db.query(User).order_by(User.created_at.desc(), User.id.desc()).all()
+    return [
+        {
+            "id": user.id,
+            "email": user.email,
+            "role": user.role,
+            "created_at": user.created_at,
+        }
+        for user in users
+    ]
+
+
+@router.post("/users", status_code=status.HTTP_201_CREATED)
+def create_user(
+    payload: UserCreate,
+    request: Request,
+    db: Session = Depends(get_db),
+    actor: User = Depends(require_role(*ADMIN_ONLY)),
+):
+    """Create an account from the administrator user-management screen."""
+    user = _create_user(db, payload.email, payload.password, payload.role)
+    audit_service.record(
+        db,
+        audit_service.USER_CREATED,
+        user=actor,
+        entity_type="user",
+        entity_id=user.id,
+        details={"created_email": user.email, "role": user.role},
+        request=request,
+    )
+    return {"id": user.id, "email": user.email, "role": user.role, "created_at": user.created_at}

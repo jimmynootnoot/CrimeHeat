@@ -9,7 +9,7 @@ from fastapi.responses import HTMLResponse, StreamingResponse
 from sqlalchemy import extract
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user
+from app.api.deps import ANALYST_OR_ADMIN, get_current_user, require_role
 from app.core.config import get_settings
 from app.db.session import get_db
 from app.models.incident import Incident
@@ -29,7 +29,7 @@ class EvaluationReportInput(BaseModel):
 
 
 @router.post('/evaluation')
-def export_evaluation(payload: EvaluationReportInput, _=Depends(get_current_user)):
+def export_evaluation(payload: EvaluationReportInput, _=Depends(require_role(*ANALYST_OR_ADMIN))):
     try:
         content = build_evaluation_workbook(
             payload.predictions_csv, payload.reference_csv, payload.functional_tests_csv,
@@ -56,7 +56,9 @@ class TemporalSplitInput(BaseModel):
 
 @router.post('/evaluation/temporal-split')
 def evaluation_temporal_split(
-    payload: TemporalSplitInput, db: Session = Depends(get_db), _=Depends(get_current_user),
+    payload: TemporalSplitInput,
+    db: Session = Depends(get_db),
+    _=Depends(require_role(*ANALYST_OR_ADMIN)),
 ):
     """Algorithmic precision/recall/F1 via a temporal train/test split.
 
