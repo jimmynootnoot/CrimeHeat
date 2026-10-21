@@ -1,0 +1,753 @@
+{
+  "metadata": {
+    "source": "PSA PSGC Q1 2026 and GeoRisk Philippines barangay boundary layer",
+    "source_package": "psgc 2026.4.13.0",
+    "coordinate_method": "barangay polygon centroid",
+    "coordinate_source": "hdx_exact_2023",
+    "crs": "EPSG:4326"
+  },
+  "municipalities": {
+    "Alamada": {
+      "Bao": {
+        "latitude": 7.422034,
+        "longitude": 124.633364,
+        "psgc_code": "1204701001"
+      },
+      "Barangiran": {
+        "latitude": 7.426404,
+        "longitude": 124.550924,
+        "psgc_code": "1204701002"
+      },
+      "Camansi": {
+        "latitude": 7.348911,
+        "longitude": 124.552859,
+        "psgc_code": "1204701003"
+      },
+      "Dado": {
+        "latitude": 7.562365,
+        "longitude": 124.539609,
+        "psgc_code": "1204701004"
+      },
+      "Guiling": {
+        "latitude": 7.530943,
+        "longitude": 124.631157,
+        "psgc_code": "1204701005"
+      },
+      "Kitacubong": {
+        "latitude": 7.390186,
+        "longitude": 124.573592,
+        "psgc_code": "1204701006"
+      },
+      "Macabasa": {
+        "latitude": 7.462007,
+        "longitude": 124.499868,
+        "psgc_code": "1204701007"
+      },
+      "Malitubog": {
+        "latitude": 7.35519,
+        "longitude": 124.625003,
+        "psgc_code": "1204701008"
+      },
+      "Mapurok": {
+        "latitude": 7.403961,
+        "longitude": 124.51558,
+        "psgc_code": "1204701009"
+      },
+      "Pacao": {
+        "latitude": 7.363187,
+        "longitude": 124.528734,
+        "psgc_code": "1204701010"
+      },
+      "Paruayan": {
+        "latitude": 7.365416,
+        "longitude": 124.591032,
+        "psgc_code": "1204701011"
+      },
+      "Pigcawaran": {
+        "latitude": 7.465742,
+        "longitude": 124.529853,
+        "psgc_code": "1204701012"
+      },
+      "Polayagan": {
+        "latitude": 7.411436,
+        "longitude": 124.569401,
+        "psgc_code": "1204701013"
+      },
+      "Rangayen": {
+        "latitude": 7.4836,
+        "longitude": 124.575844,
+        "psgc_code": "1204701014"
+      },
+      "Lower Dado": {
+        "latitude": 7.485596,
+        "longitude": 124.519772,
+        "psgc_code": "1204701015"
+      },
+      "Mirasol": {
+        "latitude": 7.380235,
+        "longitude": 124.551008,
+        "psgc_code": "1204701016"
+      },
+      "Raradangan": {
+        "latitude": 7.431166,
+        "longitude": 124.528488,
+        "psgc_code": "1204701017"
+      }
+    },
+    "Midsayap": {
+      "Agriculture": {
+        "latitude": 7.165266,
+        "longitude": 124.498819,
+        "psgc_code": "1204709002"
+      },
+      "Anonang": {
+        "latitude": 7.242438,
+        "longitude": 124.563622,
+        "psgc_code": "1204709003"
+      },
+      "Arizona": {
+        "latitude": 7.237478,
+        "longitude": 124.617767,
+        "psgc_code": "1204709004"
+      },
+      "Bagumba": {
+        "latitude": 7.193573,
+        "longitude": 124.494811,
+        "psgc_code": "1204709005"
+      },
+      "Baliki": {
+        "latitude": 7.118515,
+        "longitude": 124.551358,
+        "psgc_code": "1204709006"
+      },
+      "Bitoka": {
+        "latitude": 7.191144,
+        "longitude": 124.593739,
+        "psgc_code": "1204709007"
+      },
+      "Bual Norte": {
+        "latitude": 7.180878,
+        "longitude": 124.499495,
+        "psgc_code": "1204709008"
+      },
+      "Bual Sur": {
+        "latitude": 7.180454,
+        "longitude": 124.517031,
+        "psgc_code": "1204709009"
+      },
+      "Central Bulanan": {
+        "latitude": 7.151426,
+        "longitude": 124.541828,
+        "psgc_code": "1204709010"
+      },
+      "Central Glad": {
+        "latitude": 7.169886,
+        "longitude": 124.523112,
+        "psgc_code": "1204709012"
+      },
+      "Ilbocean": {
+        "latitude": 7.226077,
+        "longitude": 124.548065,
+        "psgc_code": "1204709013"
+      },
+      "Central Katingawan": {
+        "latitude": 7.208376,
+        "longitude": 124.526701,
+        "psgc_code": "1204709017"
+      },
+      "Kimagango": {
+        "latitude": 7.222304,
+        "longitude": 124.569407,
+        "psgc_code": "1204709018"
+      },
+      "Lagumbingan": {
+        "latitude": 7.205613,
+        "longitude": 124.495771,
+        "psgc_code": "1204709021"
+      },
+      "Lomopog": {
+        "latitude": 7.093835,
+        "longitude": 124.452204,
+        "psgc_code": "1204709022"
+      },
+      "Lower Glad": {
+        "latitude": 7.153157,
+        "longitude": 124.518886,
+        "psgc_code": "1204709023"
+      },
+      "Lower Katingawan": {
+        "latitude": 7.19403,
+        "longitude": 124.519726,
+        "psgc_code": "1204709024"
+      },
+      "Macasendeg": {
+        "latitude": 7.064494,
+        "longitude": 124.539809,
+        "psgc_code": "1204709025"
+      },
+      "Malamote": {
+        "latitude": 7.251552,
+        "longitude": 124.595353,
+        "psgc_code": "1204709026"
+      },
+      "Milaya": {
+        "latitude": 7.206665,
+        "longitude": 124.6014,
+        "psgc_code": "1204709028"
+      },
+      "Nalin": {
+        "latitude": 7.228961,
+        "longitude": 124.511383,
+        "psgc_code": "1204709031"
+      },
+      "Nes": {
+        "latitude": 7.144088,
+        "longitude": 124.5121,
+        "psgc_code": "1204709032"
+      },
+      "Patindeguen": {
+        "latitude": 7.219621,
+        "longitude": 124.493355,
+        "psgc_code": "1204709034"
+      },
+      "Barangay Poblacion 1": {
+        "latitude": 7.1885,
+        "longitude": 124.538556,
+        "psgc_code": "1204709035"
+      },
+      "Barangay Poblacion 2": {
+        "latitude": 7.183658,
+        "longitude": 124.537151,
+        "psgc_code": "1204709036"
+      },
+      "Barangay Poblacion 3": {
+        "latitude": 7.191609,
+        "longitude": 124.531372,
+        "psgc_code": "1204709037"
+      },
+      "Barangay Poblacion 4": {
+        "latitude": 7.188614,
+        "longitude": 124.529979,
+        "psgc_code": "1204709038"
+      },
+      "Barangay Poblacion 5": {
+        "latitude": 7.198653,
+        "longitude": 124.53468,
+        "psgc_code": "1204709039"
+      },
+      "Barangay Poblacion 6": {
+        "latitude": 7.193532,
+        "longitude": 124.539499,
+        "psgc_code": "1204709040"
+      },
+      "Barangay Poblacion 7": {
+        "latitude": 7.183222,
+        "longitude": 124.529614,
+        "psgc_code": "1204709041"
+      },
+      "Barangay Poblacion 8": {
+        "latitude": 7.20814,
+        "longitude": 124.543418,
+        "psgc_code": "1204709042"
+      },
+      "Palongoguen": {
+        "latitude": 7.179662,
+        "longitude": 124.479331,
+        "psgc_code": "1204709043"
+      },
+      "Rangaban": {
+        "latitude": 7.120637,
+        "longitude": 124.528985,
+        "psgc_code": "1204709044"
+      },
+      "Sadaan": {
+        "latitude": 7.183186,
+        "longitude": 124.553326,
+        "psgc_code": "1204709045"
+      },
+      "Salunayan": {
+        "latitude": 7.152287,
+        "longitude": 124.496147,
+        "psgc_code": "1204709046"
+      },
+      "San Isidro": {
+        "latitude": 7.21206,
+        "longitude": 124.513908,
+        "psgc_code": "1204709048"
+      },
+      "Santa Cruz": {
+        "latitude": 7.193169,
+        "longitude": 124.57634,
+        "psgc_code": "1204709049"
+      },
+      "Bulanan Upper": {
+        "latitude": 7.225117,
+        "longitude": 124.59565,
+        "psgc_code": "1204709052"
+      },
+      "Upper Glad I": {
+        "latitude": 7.173289,
+        "longitude": 124.539086,
+        "psgc_code": "1204709053"
+      },
+      "Upper Glad II": {
+        "latitude": 7.163931,
+        "longitude": 124.540183,
+        "psgc_code": "1204709054"
+      },
+      "Upper Labas": {
+        "latitude": 7.227318,
+        "longitude": 124.481097,
+        "psgc_code": "1204709055"
+      },
+      "Villarica": {
+        "latitude": 7.223976,
+        "longitude": 124.532603,
+        "psgc_code": "1204709056"
+      },
+      "Kiwanan": {
+        "latitude": 7.202836,
+        "longitude": 124.56531,
+        "psgc_code": "1204709057"
+      },
+      "San Pedro": {
+        "latitude": 7.15279,
+        "longitude": 124.529169,
+        "psgc_code": "1204709058"
+      }
+    },
+    "Libungan": {
+      "Abaga": {
+        "latitude": 7.237017,
+        "longitude": 124.536326,
+        "psgc_code": "1204705001"
+      },
+      "Baguer": {
+        "latitude": 7.258021,
+        "longitude": 124.466439,
+        "psgc_code": "1204705003"
+      },
+      "Barongis": {
+        "latitude": 7.265955,
+        "longitude": 124.575476,
+        "psgc_code": "1204705004"
+      },
+      "Batiocan": {
+        "latitude": 7.255507,
+        "longitude": 124.500181,
+        "psgc_code": "1204705005"
+      },
+      "Cabaruyan": {
+        "latitude": 7.262126,
+        "longitude": 124.539845,
+        "psgc_code": "1204705006"
+      },
+      "Cabpangi": {
+        "latitude": 7.271315,
+        "longitude": 124.517981,
+        "psgc_code": "1204705007"
+      },
+      "Demapaco": {
+        "latitude": 7.295548,
+        "longitude": 124.503802,
+        "psgc_code": "1204705010"
+      },
+      "Grebona": {
+        "latitude": 7.299771,
+        "longitude": 124.561676,
+        "psgc_code": "1204705011"
+      },
+      "Gumaga": {
+        "latitude": 7.240193,
+        "longitude": 124.490677,
+        "psgc_code": "1204705013"
+      },
+      "Kapayawi": {
+        "latitude": 7.311547,
+        "longitude": 124.579946,
+        "psgc_code": "1204705014"
+      },
+      "Kiloyao": {
+        "latitude": 7.323848,
+        "longitude": 124.556198,
+        "psgc_code": "1204705015"
+      },
+      "Kitubod": {
+        "latitude": 7.319949,
+        "longitude": 124.628389,
+        "psgc_code": "1204705017"
+      },
+      "Malengen": {
+        "latitude": 7.288202,
+        "longitude": 124.582901,
+        "psgc_code": "1204705019"
+      },
+      "Montay": {
+        "latitude": 7.28632,
+        "longitude": 124.545069,
+        "psgc_code": "1204705023"
+      },
+      "Nica-an": {
+        "latitude": 7.32978,
+        "longitude": 124.580574,
+        "psgc_code": "1204705024"
+      },
+      "Palao": {
+        "latitude": 7.308632,
+        "longitude": 124.608408,
+        "psgc_code": "1204705025"
+      },
+      "Poblacion": {
+        "latitude": 7.241328,
+        "longitude": 124.521126,
+        "psgc_code": "1204705029"
+      },
+      "Sinapangan": {
+        "latitude": 7.31542,
+        "longitude": 124.52958,
+        "psgc_code": "1204705032"
+      },
+      "Sinawingan": {
+        "latitude": 7.262895,
+        "longitude": 124.484947,
+        "psgc_code": "1204705033"
+      },
+      "Ulamian": {
+        "latitude": 7.296343,
+        "longitude": 124.490128,
+        "psgc_code": "1204705034"
+      }
+    },
+    "Pigcawayan": {
+      "Anick": {
+        "latitude": 7.325744,
+        "longitude": 124.454197,
+        "psgc_code": "1204711001"
+      },
+      "Upper Baguer": {
+        "latitude": 7.268427,
+        "longitude": 124.463451,
+        "psgc_code": "1204711002"
+      },
+      "Balogo": {
+        "latitude": 7.267027,
+        "longitude": 124.456222,
+        "psgc_code": "1204711004"
+      },
+      "Banucagon": {
+        "latitude": 7.253366,
+        "longitude": 124.401119,
+        "psgc_code": "1204711006"
+      },
+      "Bulucaon": {
+        "latitude": 7.247938,
+        "longitude": 124.421037,
+        "psgc_code": "1204711007"
+      },
+      "Buluan": {
+        "latitude": 7.29657,
+        "longitude": 124.415288,
+        "psgc_code": "1204711008"
+      },
+      "Capayuran": {
+        "latitude": 7.263827,
+        "longitude": 124.449164,
+        "psgc_code": "1204711010"
+      },
+      "Central Panatan": {
+        "latitude": 7.259244,
+        "longitude": 124.378079,
+        "psgc_code": "1204711011"
+      },
+      "Kimarayang": {
+        "latitude": 7.366312,
+        "longitude": 124.481203,
+        "psgc_code": "1204711015"
+      },
+      "Malagakit": {
+        "latitude": 7.241233,
+        "longitude": 124.395834,
+        "psgc_code": "1204711019"
+      },
+      "Maluao": {
+        "latitude": 7.30434,
+        "longitude": 124.397674,
+        "psgc_code": "1204711020"
+      },
+      "North Manuangan": {
+        "latitude": 7.280114,
+        "longitude": 124.404206,
+        "psgc_code": "1204711021"
+      },
+      "Midpapan I": {
+        "latitude": 7.289841,
+        "longitude": 124.435108,
+        "psgc_code": "1204711023"
+      },
+      "Mulok": {
+        "latitude": 7.339061,
+        "longitude": 124.396018,
+        "psgc_code": "1204711024"
+      },
+      "New Culasi": {
+        "latitude": 7.298441,
+        "longitude": 124.384227,
+        "psgc_code": "1204711025"
+      },
+      "New Igbaras": {
+        "latitude": 7.349489,
+        "longitude": 124.417812,
+        "psgc_code": "1204711026"
+      },
+      "New Panay": {
+        "latitude": 7.319572,
+        "longitude": 124.4132,
+        "psgc_code": "1204711027"
+      },
+      "Payong-payong": {
+        "latitude": 7.340423,
+        "longitude": 124.43405,
+        "psgc_code": "1204711030"
+      },
+      "Poblacion I": {
+        "latitude": 7.274391,
+        "longitude": 124.422866,
+        "psgc_code": "1204711031"
+      },
+      "Poblacion II": {
+        "latitude": 7.282335,
+        "longitude": 124.419196,
+        "psgc_code": "1204711032"
+      },
+      "Poblacion III": {
+        "latitude": 7.282378,
+        "longitude": 124.426493,
+        "psgc_code": "1204711033"
+      },
+      "Presbitero": {
+        "latitude": 7.284225,
+        "longitude": 124.460876,
+        "psgc_code": "1204711034"
+      },
+      "Renibon": {
+        "latitude": 7.385869,
+        "longitude": 124.457023,
+        "psgc_code": "1204711035"
+      },
+      "South Manuangan": {
+        "latitude": 7.268041,
+        "longitude": 124.400006,
+        "psgc_code": "1204711037"
+      },
+      "Tigbawan": {
+        "latitude": 7.295893,
+        "longitude": 124.45429,
+        "psgc_code": "1204711038"
+      },
+      "Tubon": {
+        "latitude": 7.264203,
+        "longitude": 124.43745,
+        "psgc_code": "1204711039"
+      },
+      "Midpapan II": {
+        "latitude": 7.309638,
+        "longitude": 124.433112,
+        "psgc_code": "1204711040"
+      },
+      "Cabpangi": {
+        "latitude": 7.240512,
+        "longitude": 124.436461,
+        "psgc_code": "1204711041"
+      }
+    },
+    "Pikit": {
+      "Balabak": {
+        "latitude": 7.122049,
+        "longitude": 124.718856,
+        "psgc_code": "1204712003"
+      },
+      "Balatican": {
+        "latitude": 7.08639,
+        "longitude": 124.682538,
+        "psgc_code": "1204712004"
+      },
+      "Bulod": {
+        "latitude": 7.019485,
+        "longitude": 124.686977,
+        "psgc_code": "1204712011"
+      },
+      "Calawag": {
+        "latitude": 7.040796,
+        "longitude": 124.651594,
+        "psgc_code": "1204712013"
+      },
+      "Dalingaoen": {
+        "latitude": 7.085041,
+        "longitude": 124.6552,
+        "psgc_code": "1204712015"
+      },
+      "Damalasak": {
+        "latitude": 7.031815,
+        "longitude": 124.606611,
+        "psgc_code": "1204712016"
+      },
+      "Ginatilan": {
+        "latitude": 7.053058,
+        "longitude": 124.637097,
+        "psgc_code": "1204712020"
+      },
+      "Inug-ug": {
+        "latitude": 7.043796,
+        "longitude": 124.690638,
+        "psgc_code": "1204712023"
+      },
+      "Kalacacan": {
+        "latitude": 7.119899,
+        "longitude": 124.650952,
+        "psgc_code": "1204712025"
+      },
+      "Katilacan": {
+        "latitude": 7.00913,
+        "longitude": 124.60144,
+        "psgc_code": "1204712026"
+      },
+      "Kolambog": {
+        "latitude": 7.042189,
+        "longitude": 124.576718,
+        "psgc_code": "1204712028"
+      },
+      "Ladtingan": {
+        "latitude": 7.053497,
+        "longitude": 124.660353,
+        "psgc_code": "1204712029"
+      },
+      "Langayen": {
+        "latitude": 7.071922,
+        "longitude": 124.569913,
+        "psgc_code": "1204712031"
+      },
+      "Paidu Pulangi": {
+        "latitude": 7.023255,
+        "longitude": 124.57087,
+        "psgc_code": "1204712046"
+      },
+      "Poblacion": {
+        "latitude": 7.053028,
+        "longitude": 124.675685,
+        "psgc_code": "1204712050"
+      },
+      "Punol": {
+        "latitude": 7.009426,
+        "longitude": 124.585103,
+        "psgc_code": "1204712051"
+      },
+      "Silik": {
+        "latitude": 7.034597,
+        "longitude": 124.592171,
+        "psgc_code": "1204712055"
+      },
+      "Takipan": {
+        "latitude": 7.093917,
+        "longitude": 124.637445,
+        "psgc_code": "1204712056"
+      },
+      "Talitay": {
+        "latitude": 7.027446,
+        "longitude": 124.700067,
+        "psgc_code": "1204712057"
+      },
+      "Tinutulan": {
+        "latitude": 7.13779,
+        "longitude": 124.694985,
+        "psgc_code": "1204712060"
+      }
+    },
+    "Aleosan": {
+      "Bagolibas": {
+        "latitude": 7.114033,
+        "longitude": 124.583532,
+        "psgc_code": "1204717001"
+      },
+      "Cawilihan": {
+        "latitude": 7.214503,
+        "longitude": 124.628032,
+        "psgc_code": "1204717002"
+      },
+      "Dualing": {
+        "latitude": 7.148669,
+        "longitude": 124.565148,
+        "psgc_code": "1204717003"
+      },
+      "Katalicanan": {
+        "latitude": 7.193092,
+        "longitude": 124.612831,
+        "psgc_code": "1204717005"
+      },
+      "Lawili": {
+        "latitude": 7.23688,
+        "longitude": 124.643854,
+        "psgc_code": "1204717006"
+      },
+      "Lower Mingading": {
+        "latitude": 7.137411,
+        "longitude": 124.614594,
+        "psgc_code": "1204717007"
+      },
+      "Luanan": {
+        "latitude": 7.179282,
+        "longitude": 124.665751,
+        "psgc_code": "1204717008"
+      },
+      "Malapang": {
+        "latitude": 7.151785,
+        "longitude": 124.660937,
+        "psgc_code": "1204717009"
+      },
+      "New Leon": {
+        "latitude": 7.193208,
+        "longitude": 124.643832,
+        "psgc_code": "1204717010"
+      },
+      "New Panay": {
+        "latitude": 7.211791,
+        "longitude": 124.674563,
+        "psgc_code": "1204717011"
+      },
+      "Pagangan": {
+        "latitude": 7.104176,
+        "longitude": 124.601164,
+        "psgc_code": "1204717012"
+      },
+      "Palacat": {
+        "latitude": 7.282265,
+        "longitude": 124.629545,
+        "psgc_code": "1204717013"
+      },
+      "Pentil": {
+        "latitude": 7.268282,
+        "longitude": 124.613725,
+        "psgc_code": "1204717014"
+      },
+      "San Mateo": {
+        "latitude": 7.150665,
+        "longitude": 124.586431,
+        "psgc_code": "1204717015"
+      },
+      "Santa Cruz": {
+        "latitude": 7.17743,
+        "longitude": 124.579027,
+        "psgc_code": "1204717016"
+      },
+      "Tomado": {
+        "latitude": 7.153551,
+        "longitude": 124.634507,
+        "psgc_code": "1204717018"
+      },
+      "Upper Mingading": {
+        "latitude": 7.170009,
+        "longitude": 124.613648,
+        "psgc_code": "1204717019"
+      }
+    }
+  }
+}

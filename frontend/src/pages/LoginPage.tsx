@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { APP_NAME } from '../api/client';
 
 export function LoginPage() {
   const { login, isAuthenticated } = useAuth();
@@ -21,8 +23,14 @@ export function LoginPage() {
     try {
       await login(email, password);
       navigate('/map');
-    } catch {
-      setError('Invalid email or password.');
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
+        setError('Invalid email or password.');
+      } else if (axios.isAxiosError(err) && !err.response) {
+        setError('Cannot connect to the sign-in service. Make sure the backend is running.');
+      } else {
+        setError('The sign-in service is unavailable. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -35,7 +43,7 @@ export function LoginPage() {
         className="bg-white shadow-md rounded-lg p-8 w-full max-w-sm space-y-4"
       >
         <div>
-          <h1 className="text-xl font-bold text-slate-900">PPALMA Crime Watch</h1>
+          <h1 className="text-xl font-bold text-slate-900">{APP_NAME}</h1>
           <p className="text-sm text-slate-500">
             Spatio-temporal crime hotspot analysis — sign in to continue.
           </p>

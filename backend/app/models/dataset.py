@@ -9,10 +9,10 @@ from app.db.base import Base
 class Dataset(Base):
     """A named, versioned collection of incident records.
 
-    Incidents belong to a dataset so synthetic and official records can coexist
-    in the database while remaining strictly separable in every query, chart,
-    and report. Mixing the two in a published finding is prohibited by the
-    study's academic rules, so `source` is recorded here as well as per-incident.
+    Incidents belong to a dataset so records of different provenance remain
+    strictly separable in every query, chart, and report. Mixing provenances in
+    a published finding is prohibited by the study's academic rules, so `source`
+    is recorded here as well as per-incident.
     """
 
     __tablename__ = "datasets"
@@ -20,8 +20,8 @@ class Dataset(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(200), index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
-    # synthetic | official | geocoded | generalized | manually_verified
-    source: Mapped[str] = mapped_column(String(30), index=True, default="synthetic")
+    # official | geocoded | generalized | manually_verified
+    source: Mapped[str] = mapped_column(String(30), index=True, default="official")
     version: Mapped[str] = mapped_column(String(50), default="1.0")
     is_active: Mapped[bool] = mapped_column(default=True, index=True)
     record_count: Mapped[int] = mapped_column(Integer, default=0)

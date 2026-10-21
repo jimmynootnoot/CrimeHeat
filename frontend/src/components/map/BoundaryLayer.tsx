@@ -13,19 +13,25 @@ export function BoundaryLayer({
   onMunicipalityClick,
   activeMunicipality,
   incidentCounts,
+  initialFitEnabled,
   onBoundsReady,
   onMunicipalityBoundsReady,
+  onInternalMunicipalityBoundsReady,
 }: {
   onMunicipalityClick: (name: string) => void;
   activeMunicipality: string | null;
-  incidentCounts: Record<string, number>;
+  incidentCounts: Record<string, number> | null;
+  initialFitEnabled?: boolean;
   onBoundsReady?: (bounds: LatLngBounds) => void;
   onMunicipalityBoundsReady?: (name: string, bounds: LatLngBounds) => void;
+  onInternalMunicipalityBoundsReady?: (name: string, bounds: LatLngBounds) => void;
 }) {
   const map = useMap();
   const [boundaries, setBoundaries] = useState<FeatureCollection | null>(null);
   const geoJsonRef = useRef<LeafletGeoJSON | null>(null);
   const fitted = useRef(false);
+  const countsRef = useRef(incidentCounts);
+  countsRef.current = incidentCounts;
 
   useEffect(() => {
     fetchMunicipalityBoundaries().then(setBoundaries);
@@ -35,12 +41,18 @@ export function BoundaryLayer({
     if (boundaries && geoJsonRef.current && !fitted.current) {
       const bounds = geoJsonRef.current.getBounds();
       if (bounds.isValid()) {
-        map.fitBounds(bounds, { padding: [24, 24] });
+        if (initialFitEnabled !== false) {
+          map.fitBounds(bounds, { padding: [24, 24] });
+        }
+        // Keep the study area as the focus: generous padding so there's
+        // still room to pan/zoom for context, but users can't wander off
+        // to unrelated provinces.
+        map.setMaxBounds(bounds.pad(0.6));
         onBoundsReady?.(bounds);
         fitted.current = true;
       }
     }
-  }, [boundaries, map, onBoundsReady]);
+  }, [boundaries, map, initialFitEnabled, onBoundsReady]);
 
   if (!boundaries) return null;
 
@@ -60,17 +72,18 @@ export function BoundaryLayer({
         const name = displayMunicipality(feature.properties?.adm3_en);
         layer.bindTooltip(name, { permanent: true, direction: 'center', className: 'ppalma-label' });
 
-        const count = incidentCounts[name];
-        layer.bindPopup(
-          `<div style="font-size:12px"><b>${name}</b><br/>${
-            count !== undefined ? `${count} recorded incidents` : 'No data yet'
-          }</div>`,
-          { closeButton: false, autoPan: false }
-        );
+        layer.bindPopup(() => {
+          const content = document.createElement('div');
+          const count = countsRef.current === null ? null : countsRef.current[name] ?? 0;
+          content.textContent = `${name}: ${count === null ? 'Updating counts…' : `${count} incidents in selected location, crime and year filters`}`;
+          return content;
+        }, { closeButton: false, autoPan: false });
 
         const pathLayer = layer as LeafletGeoJSON;
         if ('getBounds' in pathLayer && typeof (pathLayer as unknown as { getBounds: () => LatLngBounds }).getBounds === 'function') {
-          onMunicipalityBoundsReady?.(name, (pathLayer as unknown as { getBounds: () => LatLngBounds }).getBounds());
+          const bounds = (pathLayer as unknown as { getBounds: () => LatLngBounds }).getBounds();
+          onMunicipalityBoundsReady?.(name, bounds);
+          onInternalMunicipalityBoundsReady?.(name, bounds);
         }
 
         layer.on({

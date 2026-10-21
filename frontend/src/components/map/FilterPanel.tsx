@@ -18,12 +18,13 @@ const PERSISTENCE_CATEGORIES: (PersistenceCategory | 'all')[] = [
   'temporary',
 ];
 
-function activeFilterCount(filters: MapFilterState): number {
+function activeFilterCount(filters: MapFilterState, mode: MapMode): number {
   let n = 0;
   if (filters.municipality) n++;
   if (filters.barangay) n++;
   if (filters.crime_type) n++;
-  if (filters.persistence_category !== 'all') n++;
+  if (mode === 'persistence' && filters.persistence_category !== 'all') n++;
+  if (mode !== 'persistence' && filters.year !== 'all') n++;
   return n;
 }
 
@@ -41,7 +42,7 @@ export function FilterPanel({
   metadata: AnalysisMetadata;
 }) {
   const [collapsed, setCollapsed] = useState(false);
-  const count = activeFilterCount(filters);
+  const count = activeFilterCount(filters, mode);
 
   function set<K extends keyof MapFilterState>(key: K, value: MapFilterState[K]) {
     onChange({ ...filters, [key]: value });
@@ -70,7 +71,7 @@ export function FilterPanel({
             <label className="mb-1 block text-xs font-medium text-slate-500">Municipality</label>
             <select
               value={filters.municipality}
-              onChange={(e) => set('municipality', e.target.value)}
+              onChange={(e) => onChange({ ...filters, municipality: e.target.value, barangay: '' })}
               className="w-full rounded border border-slate-300 px-2 py-1.5"
             >
               <option value="">All municipalities</option>
@@ -148,7 +149,7 @@ export function FilterPanel({
               <div className="mt-1 flex items-center justify-between">
                 <span>
                   Min samples
-                  <InfoIcon text="Minimum number of points required within eps to form a cluster. Points that don't meet this are labeled noise." />
+                  <InfoIcon text="Minimum number of points within epsilon, including the point itself, to be a core point. Other points may join as border points; points outside all clusters are noise." />
                 </span>
                 <span className="font-mono font-semibold">{metadata.min_samples ?? '—'}</span>
               </div>

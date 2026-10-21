@@ -1,3 +1,5 @@
+from urllib.parse import urlsplit
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -6,14 +8,29 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
+
+def _frontend_origins(configured_origin: str) -> list[str]:
+    """Accept equivalent loopback hostnames during local development."""
+    origin = configured_origin.rstrip("/")
+    parsed = urlsplit(origin)
+    if parsed.hostname not in {"localhost", "127.0.0.1", "::1"}:
+        return [origin]
+
+    port = f":{parsed.port}" if parsed.port else ""
+    return [
+        f"{parsed.scheme}://localhost{port}",
+        f"{parsed.scheme}://127.0.0.1{port}",
+        f"{parsed.scheme}://[::1]{port}",
+    ]
+
 app = FastAPI(
     title="PPALMA Crime Mapping Tool API",
-    description="Development API backed by synthetic data until the official PNP dataset is released.",
+    description="Spatio-temporal crime hotspot analysis over the official PNP incident dataset.",
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_origin],
+    allow_origins=_frontend_origins(settings.frontend_origin),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { APP_NAME } from '../api/client';
 
 const links = [
   { to: '/dashboard', label: 'Dashboard' },
@@ -15,7 +16,9 @@ export function NavBar() {
   return (
     <nav className="flex items-center justify-between bg-slate-900 text-slate-100 px-4 py-2">
       <div className="flex items-center gap-4">
-        <span className="font-bold tracking-wide">PPALMA Crime Watch</span>
+        <span className="font-bold tracking-wide" title={APP_NAME}>
+          PPALMA
+        </span>
         <div className="flex gap-1">
           {links.map((link) => (
             <NavLink

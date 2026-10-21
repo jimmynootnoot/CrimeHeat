@@ -25,6 +25,11 @@ export function ClusterDetailPanel({
         </div>
       </div>
 
+      <dl className="grid grid-cols-2 gap-3 rounded border border-slate-200 p-3">
+        <div><dt className="text-xs text-slate-500">Core points · solid</dt><dd className="text-lg font-semibold">{cluster.core_point_count ?? '—'}</dd></div>
+        <div><dt className="text-xs text-slate-500">Border points · hollow</dt><dd className="text-lg font-semibold">{cluster.border_point_count ?? '—'}</dd></div>
+      </dl>
+
       <div>
         <h3 className="mb-2 font-semibold text-slate-800">Barangays involved</h3>
         <ul className="flex flex-wrap gap-1.5">

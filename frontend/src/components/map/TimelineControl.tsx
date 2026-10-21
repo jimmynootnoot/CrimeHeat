@@ -96,6 +96,15 @@ export function TimelineControl({
           {value === 'all' ? 'All' : value}
         </span>
       </div>
+
+      {/* Be explicit about what "All years" does: it is a pooled overview, not
+          a per-period result. Selecting a single year is what gives the
+          period-by-period clustering the study reports on. */}
+      <p className="mt-2 text-[11px] leading-snug text-slate-500">
+        {value === 'all'
+          ? 'All years pools every period into one run. Pick a year to cluster that period on its own.'
+          : `Clustering ${value} on its own, separately from the other periods.`}
+      </p>
     </div>
   );
 }

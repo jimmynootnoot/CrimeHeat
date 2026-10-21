@@ -7,6 +7,7 @@ import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { EmptyState } from '../components/ui/EmptyState';
 import { ErrorState } from '../components/ui/ErrorState';
 import { SkeletonTableRows } from '../components/ui/Skeleton';
+import { formatIncidentDate } from '../utils/incidentDate';
 
 const PAGE_SIZE = 25;
 
@@ -84,6 +85,13 @@ export function RecordsPage() {
         <p className="text-sm text-slate-500">
           {total} records. Victim and suspect identities are never stored or displayed.
         </p>
+        {items.some((i) => i.date_precision === 'year_only') && (
+          <p className="mt-1 text-xs text-slate-500">
+            Rows marked <span className="rounded bg-slate-100 px-1 font-medium">year only</span>{' '}
+            came from a source that supplied the year but no incident date. They are counted in
+            year-based analysis; their day and month are unknown.
+          </p>
+        )}
       </div>
 
       <div className="flex flex-wrap gap-3">
@@ -172,15 +180,29 @@ export function RecordsPage() {
                   <tr key={i.id} className="border-t border-slate-100">
                     <td className="px-3 py-2 font-mono text-xs">{i.incident_id}</td>
                     <td className="px-3 py-2">{i.crime_type}</td>
-                    <td className="px-3 py-2">{i.incident_date}</td>
+                    <td className="px-3 py-2">
+                      {(() => {
+                        const shown = formatIncidentDate(i);
+                        return (
+                          <span title={shown.title} className={shown.approximate ? 'text-slate-500' : undefined}>
+                            {shown.label}
+                            {shown.approximate && (
+                              <span className="ml-1 rounded bg-slate-100 px-1 text-[10px] font-medium text-slate-600">
+                                year only
+                              </span>
+                            )}
+                          </span>
+                        );
+                      })()}
+                    </td>
                     <td className="px-3 py-2">{i.municipality}</td>
                     <td className="px-3 py-2">{i.barangay}</td>
                     <td className="px-3 py-2">
                       <span
                         className={`rounded px-2 py-0.5 text-xs font-medium ${
-                          i.source === 'synthetic'
-                            ? 'bg-amber-100 text-amber-800'
-                            : 'bg-emerald-100 text-emerald-800'
+                          i.source === 'official'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-amber-100 text-amber-800'
                         }`}
                       >
                         {i.source}

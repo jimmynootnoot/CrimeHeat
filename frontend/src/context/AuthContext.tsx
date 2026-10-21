@@ -33,8 +33,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(readStoredUser);
 
   const login = useCallback(async (email: string, password: string) => {
+    const normalizedEmail = email.trim().toLowerCase();
     const form = new URLSearchParams();
-    form.set('username', email);
+    form.set('username', normalizedEmail);
     form.set('password', password);
     const response = await apiClient.post('/api/auth/login', form, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -43,9 +44,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // malformed response can never silently grant elevated access.
     const role: UserRole = response.data.role ?? 'viewer';
     localStorage.setItem('access_token', response.data.access_token);
-    localStorage.setItem('user_email', email);
+    localStorage.setItem('user_email', normalizedEmail);
     localStorage.setItem('user_role', role);
-    setUser({ email, role });
+    setUser({ email: normalizedEmail, role });
   }, []);
 
   const logout = useCallback(async () => {

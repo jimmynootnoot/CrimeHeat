@@ -23,3 +23,37 @@ body {
   text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff;
 }
 
+.location-marker { background: transparent; border: 0; }
+.location-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Sized per marker so incident count is readable as symbol area. */
+  width: var(--location-size, 48px);
+  height: var(--location-size, 48px);
+  border: 3px solid white;
+  border-radius: 50%;
+  background: var(--location-color);
+  color: white;
+  font: 700 clamp(10px, calc(var(--location-size, 48px) * 0.28), 14px)/1 system-ui, sans-serif;
+  /* Tighter halo than before: the shaded extent underneath now carries the
+     emphasis, so the badge labels the hotspot instead of masking the map. */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--location-color) 18%, transparent), 0 2px 8px #0f172a33;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.location-marker:hover .location-badge,
+.location-marker:focus-visible .location-badge {
+  transform: scale(1.12);
+  box-shadow: 0 0 0 9px color-mix(in srgb, var(--location-color) 22%, transparent), 0 6px 18px #0f172a50;
+}
+.location-marker:focus-visible { outline: 3px solid #0f172a; border-radius: 50%; }
+.leaflet-tooltip.location-tooltip {
+  border: 0;
+  border-radius: 12px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 16px #0f172a20;
+  font: 600 12px/1.5 system-ui, sans-serif;
+}
+@media (prefers-reduced-motion: reduce) {
+  .location-badge { transition: none; }
+}

@@ -16,6 +16,7 @@ def get_clusters(
     year: Optional[int] = None,
     crime_type: Optional[str] = None,
     municipality: Optional[str] = None,
+    barangay: Optional[str] = None,
     eps_km: Optional[float] = None,
     min_samples: Optional[int] = None,
     db: Session = Depends(get_db),
@@ -27,6 +28,7 @@ def get_clusters(
         year=year,
         crime_type=crime_type,
         municipality=municipality,
+        barangay=barangay,
         eps_km=eps_km or settings.dbscan_eps_km,
         min_samples=min_samples or settings.dbscan_min_samples,
     )

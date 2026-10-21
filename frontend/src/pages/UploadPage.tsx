@@ -1,4 +1,5 @@
 import { useState, useRef, type ChangeEvent, type DragEvent } from 'react';
+import axios from 'axios';
 import { ColumnMappingForm } from '../components/upload/ColumnMappingForm';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -11,6 +12,12 @@ import {
 } from '../api/endpoints';
 
 type Step = 'select' | 'map' | 'validated' | 'done';
+
+/** Prefer the API's own explanation — it names what actually failed. */
+function serverMessage(err: unknown, fallback: string): string {
+  const detail = axios.isAxiosError(err) ? err.response?.data?.detail : undefined;
+  return typeof detail === 'string' && detail ? detail : fallback;
+}
 
 const STEP_ORDER: Step[] = ['select', 'map', 'validated', 'done'];
 const STEP_LABELS: { step: Step; label: string }[] = [
@@ -76,8 +83,8 @@ export function UploadPage() {
       setPreview(result);
       setMapping(result.suggested_mapping);
       setStep('map');
-    } catch {
-      setError('Could not read this file. Confirm it is a valid CSV or Excel export.');
+    } catch (err) {
+      setError(serverMessage(err, 'Could not read this file. Confirm it is a valid CSV or Excel export.'));
     } finally {
       setBusy(false);
     }
@@ -103,8 +110,8 @@ export function UploadPage() {
       const result = await validateUpload(preview.batch_id, mapping);
       setValidation(result);
       setStep('validated');
-    } catch {
-      setError('Validation failed. Check the column mapping and try again.');
+    } catch (err) {
+      setError(serverMessage(err, 'Validation failed. Check the column mapping and try again.'));
     } finally {
       setBusy(false);
     }
@@ -118,8 +125,8 @@ export function UploadPage() {
       const result = await commitUpload(preview.batch_id, mapping);
       setImportedCount(result.imported_count);
       setStep('done');
-    } catch {
-      setError('Import failed. No rows were committed.');
+    } catch (err) {
+      setError(serverMessage(err, 'Import failed. No rows were committed.'));
     } finally {
       setBusy(false);
     }
@@ -140,8 +147,8 @@ export function UploadPage() {
       <div>
         <h1 className="text-xl font-bold text-slate-900">Import Crime Records</h1>
         <p className="text-sm text-slate-500">
-          Reusable CSV/Excel import — this same flow will be used to load the official PNP
-          dataset once it is released.
+          Upload the PNP export as you received it — the importer standardizes barangay and
+          crime-type spellings, fills gaps, and lists every correction before anything is saved.
         </p>
       </div>
 
@@ -187,6 +194,13 @@ export function UploadPage() {
             <span className="font-medium">{fileName}</span> — {preview.row_count} rows detected.
             Review the suggested mapping below.
           </p>
+          {preview.notes?.length > 0 && (
+            <ul className="rounded-lg border border-sky-200 bg-sky-50 px-4 py-2 text-sm text-sky-900">
+              {preview.notes.map((note, idx) => (
+                <li key={idx}>{note}</li>
+              ))}
+            </ul>
+          )}
           <ColumnMappingForm
             sourceColumns={preview.columns}
             mapping={mapping}
@@ -225,8 +239,23 @@ export function UploadPage() {
               )}
             </div>
             <p className="text-sm text-slate-600">
-              {validation.valid_count} valid rows, {validation.error_count} rows with errors.
+              <span className="font-semibold text-emerald-700">
+                {validation.valid_count.toLocaleString()} rows will import
+              </span>
+              {' — '}
+              {validation.warning_count.toLocaleString()} with advisories,{' '}
+              {validation.error_count.toLocaleString()} rejected.
             </p>
+            {Object.keys(validation.rejected_by_field ?? {}).length > 0 && (
+              <p className="mt-1 text-xs text-slate-500">
+                Rejected by reason:{' '}
+                {Object.entries(validation.rejected_by_field)
+                  .map(([field, count]) => `${field} ${count.toLocaleString()}`)
+                  .join(' · ')}
+                . Records outside the six PPALMA municipalities, and offences outside the eight
+                index crimes, are excluded by design.
+              </p>
+            )}
             {validation.errors.length > 0 && (
               <div className="mt-3 max-h-80 overflow-y-auto">
                 <table className="min-w-full text-xs">
@@ -242,7 +271,13 @@ export function UploadPage() {
                       <tr key={idx} className="border-t border-slate-100">
                         <td className="py-1 pr-4">{err.row}</td>
                         <td className="py-1 pr-4 font-mono">{err.field}</td>
-                        <td className="py-1 text-red-600">{err.message}</td>
+                        <td
+                          className={`py-1 ${
+                            err.severity === 'warning' ? 'text-amber-700' : 'text-red-600'
+                          }`}
+                        >
+                          {err.message}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -256,6 +291,45 @@ export function UploadPage() {
               </div>
             )}
           </div>
+
+          {validation.standardizations.length > 0 && (
+            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow">
+              <h2 className="font-semibold text-slate-800">
+                Organized for you ({validation.standardizations.length} corrections)
+              </h2>
+              <p className="mt-1 text-sm text-slate-600">
+                The importer standardized these values so the file did not have to be cleaned by
+                hand. Every change is listed rather than applied silently.
+              </p>
+              <div className="mt-3 max-h-80 overflow-y-auto">
+                <table className="min-w-full text-xs">
+                  <thead className="sticky top-0 bg-white text-left text-slate-500">
+                    <tr>
+                      <th className="py-1 pr-4">Row</th>
+                      <th className="py-1 pr-4">Field</th>
+                      <th className="py-1 pr-4">From</th>
+                      <th className="py-1">To</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {validation.standardizations.slice(0, 50).map((fix, idx) => (
+                      <tr key={idx} className="border-t border-slate-100">
+                        <td className="py-1 pr-4">{fix.row}</td>
+                        <td className="py-1 pr-4 font-mono">{fix.field}</td>
+                        <td className="py-1 pr-4 text-slate-500 line-through">{fix.from}</td>
+                        <td className="py-1 font-medium text-emerald-700">{fix.to}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {validation.standardizations.length > 50 && (
+                  <p className="mt-2 text-xs text-slate-400">
+                    Showing first 50 of {validation.standardizations.length} corrections.
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
 
           {!isAdmin && (
             <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">

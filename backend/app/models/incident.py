@@ -44,10 +44,16 @@ class Incident(Base):
     coordinate_source: Mapped[str | None] = mapped_column(String(30), nullable=True, index=True)
     # exact | approximate | barangay_level — drives data-quality warnings.
     coordinate_precision: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    # exact | year_only. "year_only" marks a record whose source gave no
+    # incident date, only the year (a per-year worksheet tab); incident_date
+    # then carries a placeholder day and must never be read as the day of the
+    # offense. Year-based analysis (the study's persistence periods) stays
+    # valid; month- or day-level analysis does not.
+    date_precision: Mapped[str] = mapped_column(String(20), default="exact", index=True)
     reporting_station: Mapped[str | None] = mapped_column(String(150), nullable=True)
     case_status_generalized: Mapped[str | None] = mapped_column(String(50), nullable=True)
     notes_non_sensitive: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     dataset_id: Mapped[int | None] = mapped_column(ForeignKey("datasets.id"), nullable=True, index=True)
-    source: Mapped[str] = mapped_column(String(30), default="synthetic", index=True)
+    source: Mapped[str] = mapped_column(String(30), default="official", index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

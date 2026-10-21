@@ -12,8 +12,13 @@ scikit-learn>=1.6
 geopandas>=1.0
 shapely>=2.0
 statsmodels>=0.14
+scipy>=1.14
 python-jose[cryptography]>=3.3
 bcrypt>=4.2
 python-multipart>=0.0.20
 openpyxl>=3.1
+# Legacy .xls workbooks, and "Excel" exports that are really HTML tables —
+# both are common in government record systems.
+xlrd>=2.0
+lxml>=5.0
 python-dotenv>=1.0

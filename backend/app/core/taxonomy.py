@@ -1,9 +1,9 @@
 """Canonical vocabulary for municipalities and crime classifications.
 
-This is the single source of truth shared by the synthetic-data generator, the
-CSV/Excel importer, the validation layer, and the analytical services. Keeping
-one module authoritative is what makes the eventual swap to official PNP data a
-mapping exercise rather than a code change.
+This is the single source of truth shared by the CSV/Excel importer, the
+validation layer, and the analytical services. Keeping one module authoritative
+is what makes accepting a new PNP export a mapping exercise rather than a code
+change.
 
 Two separate concerns live here:
 
@@ -20,6 +20,8 @@ read, not by editing sourced data.
 Any standardization applied to a row must be surfaced in the import report
 (never silently applied), per specification section 8.
 """
+
+import re
 
 # --- Municipalities -------------------------------------------------------
 
@@ -91,7 +93,6 @@ CRIME_TYPE_ALIASES: dict[str, str] = {
 # --- Data source values ---------------------------------------------------
 
 ALLOWED_SOURCES: list[str] = [
-    "synthetic",
     "official",
     "geocoded",
     "generalized",
@@ -122,6 +123,44 @@ def normalize_municipality(value: object) -> tuple[str | None, bool]:
     return canonical, str(value).strip() != canonical
 
 
+# PNP blotter exports name an offense by its statute, not by the short study
+# label: "THEFT  - RPC Art. 308", "ANTI-RAPE LAW OF 1997 - RA 8353", "NEW
+# ANTI-CARNAPPING ACT OF 2016 - MC - RA 10883 (repealed RA 6539)". The citation
+# is stripped and the remaining offense phrase matched.
+_CITATION = re.compile(
+    r"\s*[-–—]\s*(?:RPC|RA|PD|BP|MC|EO|COMMONWEALTH|ART\.?|ARTICLE)\b.*$",
+    re.IGNORECASE,
+)
+
+# Phrases that disqualify a record before any keyword match. A quasi-offense
+# under RPC Art. 365 is a negligence case (a traffic collision), not the
+# intentional index crime whose name it contains, and PNP index-crime
+# reporting counts it separately. Matching "HOMICIDE" inside "RECKLESS
+# IMPRUDENCE RESULTING TO HOMICIDE" would inflate the homicide series.
+_NOT_INDEX_CRIMES = (
+    "RECKLESS IMPRUDENCE",
+    "ACTS OF LASCIVIOUSNESS",
+    "ATTEMPTED RAPE BY SEXUAL ASSAULT",
+)
+
+# Offense phrase -> canonical index crime. The phrase appearing EARLIEST in the
+# offense name wins, because the special complex crimes are named for their
+# principal offense first: "Robbery with Homicide" (RPC Art. 294) is a robbery
+# and "Rape with Homicide" (Art. 266-B) is a rape. Ranking by list order instead
+# would file both under Homicide and understate both series.
+_INDEX_CRIME_PHRASES: list[tuple[str, str]] = [
+    ("CATTLE RUSTLING", "Cattle Rustling"),
+    ("CARNAPPING", "Carnapping"),
+    ("MURDER", "Murder"),
+    ("HOMICIDE", "Homicide"),
+    ("RAPE", "Rape"),
+    ("ROBBERY", "Robbery"),
+    ("THEFT", "Theft"),
+    ("PHYSICAL INJUR", "Physical Injury"),
+    ("MALTREATMENT", "Physical Injury"),
+]
+
+
 def normalize_crime_type(value: object) -> tuple[str | None, bool]:
     """Return (canonical_crime_type, was_standardized).
 
@@ -131,10 +170,24 @@ def normalize_crime_type(value: object) -> tuple[str | None, bool]:
     """
     if value is None:
         return None, False
+
     canonical = CRIME_TYPE_ALIASES.get(_key(value))
-    if canonical is None:
+    if canonical is not None:
+        return canonical, str(value).strip() != canonical
+
+    text = " ".join(str(value).strip().upper().split())
+    if any(phrase in text for phrase in _NOT_INDEX_CRIMES):
         return None, False
-    return canonical, str(value).strip() != canonical
+
+    offense = _CITATION.sub("", text).strip()
+    canonical = CRIME_TYPE_ALIASES.get(_key(offense))
+    if canonical is not None:
+        return canonical, True
+
+    hits = [(offense.index(p), crime) for p, crime in _INDEX_CRIME_PHRASES if p in offense]
+    if hits:
+        return min(hits)[1], True
+    return None, False
 
 
 def normalize_source(value: object) -> str | None:

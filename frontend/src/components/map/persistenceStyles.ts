@@ -10,6 +10,6 @@ export const PERSISTENCE_STYLES: Record<
 > = {
   temporary: { color: '#1d4ed8', fillColor: '#60a5fa', weight: 1, fillOpacity: 0.2 },
   intermittent: { color: '#b45309', fillColor: '#fbbf24', weight: 2, fillOpacity: 0.35 },
-  historical_persistent: { color: '#6d28d9', fillColor: '#a78bfa', weight: 3, fillOpacity: 0.5 },
+  historical_persistent: { color: '#dc2626', fillColor: '#fca5a5', weight: 3, fillOpacity: 0.5 },
   active_persistent: { color: '#991b1b', fillColor: '#ef4444', weight: 4, fillOpacity: 0.65 },
 };

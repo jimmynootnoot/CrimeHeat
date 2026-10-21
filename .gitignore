@@ -5,8 +5,13 @@ backend/**/__pycache__/
 frontend/node_modules/
 frontend/dist/
 frontend/.env
+.vercel/
 *.pyc
 .DS_Store
 *.log
 *.pid
 .claude/settings.local.json
+
+# Real PNP incident data — never commit. Obtained under an FOI request and
+# covered by the study data-sharing terms.
+data/pnp/

@@ -1,4 +1,5 @@
 import json
+from collections import Counter
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
@@ -64,10 +65,24 @@ def import_schema(_=Depends(get_current_user)):
         "notes": [
             "Only the eight index crimes listed above are accepted; other offense "
             "types are rejected rather than grouped into an 'Other' category.",
-            "'Pigkawayan' is accepted and standardized to 'Pigcawayan'. Every "
-            "standardization is reported in the import summary.",
-            "Coordinates are validated against the six PPALMA municipality "
-            "polygons; records outside the study area are rejected.",
+            "Barangay spellings are resolved to their official PSGC name: "
+            "'BRGY. BALABAK', 'Brgy Balabak' and 'Poblacion I' / 'Poblacion 1' "
+            "all match. 'Pigkawayan' is standardized to 'Pigcawayan'.",
+            "Latitude/longitude are optional. A row without usable coordinates "
+            "is placed at its barangay's official centroid and labeled "
+            "barangay-level precision; a row with no usable location at all is rejected.",
+            "A missing barangay is recovered from the coordinate, and a missing "
+            "reference number is assigned one, so rows are not lost to blank cells.",
+            "Ambiguous numeric dates are read in the order the file itself proves "
+            "(a value like 25/12 makes the whole column day-first). When nothing "
+            "in the column settles the order, the affected rows are flagged rather "
+            "than quietly assigned one reading.",
+            "Worksheets (.xlsx/.xls) are read with their real date and time cells "
+            "intact. A title block above the header row is skipped automatically, "
+            "and tabs sharing the same columns (one per year, say) are combined; "
+            "tabs with different columns are left out and named in the summary.",
+            "Every correction the importer applies is listed in the import "
+            "summary rather than applied silently.",
             "Do not include victim, suspect, or witness names, contact numbers, "
             "or exact residential addresses — the schema has no field for them.",
         ],
@@ -98,7 +113,7 @@ async def preview_upload(
         raise HTTPException(400, f"File exceeds the {settings.max_upload_size_mb:.0f} MB upload limit.")
 
     try:
-        df = parse_file(file.filename, content)
+        df, parse_notes = parse_file(file.filename, content)
     except Exception as exc:
         raise HTTPException(400, f"Could not parse file: {exc}") from exc
 
@@ -109,7 +124,8 @@ async def preview_upload(
     # pandas can't hold Python None inside a numeric (float64) column — it silently
     # reverts to NaN, which Postgres's JSON column then rejects. Round-tripping
     # through to_json() lets pandas do that NaN -> null conversion correctly.
-    rows = json.loads(df.to_json(orient="records"))
+    # date_format='iso' keeps any datetime cell readable instead of epoch millis.
+    rows = json.loads(df.to_json(orient="records", date_format="iso"))
 
     batch = ImportBatch(
         filename=file.filename,
@@ -138,6 +154,7 @@ async def preview_upload(
         "sample_rows": rows[:10],
         "suggested_mapping": suggest_mapping(columns),
         "row_count": len(rows),
+        "notes": parse_notes,
     }
 
 
@@ -155,7 +172,7 @@ def validate_batch(
 
     known_municipalities = {m.name for m in db.query(Municipality).all()}
     valid_rows, issues, standardizations = validate_rows(
-        batch.rows, body.mapping, known_municipalities
+        batch.rows, body.mapping, known_municipalities, id_prefix=f"B{batch.id}"
     )
     rejected, warnings = _split_issues(issues)
 
@@ -198,6 +215,11 @@ def validate_batch(
         "valid_count": len(valid_rows),
         "warning_count": len(warnings),
         "error_count": len(rejected),
+        # Counts per field, so a province-wide export whose out-of-area records
+        # are rejected by design reads as one expected line rather than as
+        # thousands of individual failures.
+        "rejected_by_field": dict(Counter(i["field"] for i in rejected).most_common()),
+        "standardized_by_field": dict(Counter(s["field"] for s in standardizations).most_common()),
         # Kept under the key the existing frontend reads; rejected rows first so
         # the operator sees blocking problems before advisories.
         "errors": (rejected + warnings)[:500],
@@ -221,17 +243,12 @@ def commit_batch(
 
     known_municipalities = {m.name for m in db.query(Municipality).all()}
     valid_rows, issues, standardizations = validate_rows(
-        batch.rows, body.mapping, known_municipalities
+        batch.rows, body.mapping, known_municipalities, id_prefix=f"B{batch.id}"
     )
     if not valid_rows:
         raise HTTPException(400, "No valid rows to import.")
 
-    settings = get_settings()
-    # An import while the system is in synthetic mode is still tagged
-    # 'synthetic'; real records must only be loaded with DATA_SOURCE=official,
-    # so the two can never be conflated by an operator's mistake.
-    source = "synthetic" if settings.data_source == "synthetic" else "official"
-    inserted, skipped = commit_rows(db, valid_rows, source=source)
+    inserted, skipped = commit_rows(db, valid_rows, source="official")
 
     batch.status = "committed"
     db.commit()
@@ -245,7 +262,7 @@ def commit_batch(
         details={
             "imported": inserted,
             "skipped_existing": skipped,
-            "source": source,
+            "source": "official",
             "standardized": len(standardizations),
         },
         request=request,
@@ -254,5 +271,5 @@ def commit_batch(
     return {
         "imported_count": inserted,
         "skipped_existing": skipped,
-        "source": source,
+        "source": "official",
     }

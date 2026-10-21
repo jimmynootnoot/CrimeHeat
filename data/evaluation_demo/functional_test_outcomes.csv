@@ -1,0 +1,5 @@
+case_code,status
+MAP-01,passed
+FILTER-01,failed
+EXPORT-01,blocked
+UPLOAD-01,not_run

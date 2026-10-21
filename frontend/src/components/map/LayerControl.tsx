@@ -11,7 +11,14 @@ interface LayerDef {
 const LAYER_DEFS: LayerDef[] = [
   { key: 'boundaries', label: 'Municipality boundaries', modes: ['incident', 'cluster', 'persistence'] },
   { key: 'incidents', label: 'Raw incidents', modes: ['incident'] },
-  { key: 'clusters', label: 'DBSCAN clusters', modes: ['cluster'] },
+  { key: 'clusters', label: 'Cluster envelopes and counts', modes: ['cluster'] },
+  { key: 'core', label: 'Core points (zoom 13+)', modes: ['cluster'] },
+  {
+    key: 'border',
+    label: 'Border points',
+    info: 'Incidents inside a cluster that have fewer than min-samples neighbours within epsilon. They belong to the cluster, but are not themselves dense enough to be core points.',
+    modes: ['cluster'],
+  },
   { key: 'noise', label: 'Noise points', modes: ['cluster'] },
   { key: 'persistence', label: 'Persistence hotspots', modes: ['persistence'] },
   {

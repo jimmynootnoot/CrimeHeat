@@ -36,6 +36,7 @@ export interface ClusterQuery {
   year?: number;
   crime_type?: string;
   municipality?: string;
+  barangay?: string;
   eps_km?: number;
   min_samples?: number;
 }
@@ -74,8 +75,7 @@ export async function deleteIncident(id: number): Promise<void> {
 
 export interface DashboardSummary {
   total_incidents: number;
-  synthetic_incidents: number;
-  pnp_incidents: number;
+  official_incidents: number;
   crime_type_breakdown: Record<string, number>;
   municipality_breakdown: Record<string, number>;
   year_breakdown: Record<string, number>;
@@ -92,12 +92,29 @@ export async function fetchDashboardSummary(): Promise<DashboardSummary> {
   return res.data;
 }
 
+export async function fetchIncidentSummary(
+  filters: IncidentFilters,
+  signal?: AbortSignal
+): Promise<{
+  municipality_breakdown: Record<string, number>;
+  total_incidents: number;
+  /** [min longitude, min latitude, max longitude, max latitude] */
+  bounds: [number, number, number, number] | null;
+  /** Official barangay polygon centroid as [latitude, longitude]. */
+  focus: [number, number] | null;
+}> {
+  const res = await apiClient.get('/api/incidents/summary', { params: filters, signal });
+  return res.data;
+}
+
 export interface UploadPreview {
   batch_id: number;
   columns: string[];
   sample_rows: Record<string, unknown>[];
   suggested_mapping: Record<string, string>;
   row_count: number;
+  /** What the reader had to work out, e.g. which worksheets were combined. */
+  notes: string[];
 }
 
 const TARGET_FIELDS = [
@@ -128,12 +145,27 @@ export interface ValidationError {
   row: number;
   field: string;
   message: string;
+  severity?: 'rejected' | 'warning';
+}
+
+/** A value the importer corrected on the way in — reported, never silent. */
+export interface Standardization {
+  row: number;
+  field: string;
+  from: string;
+  to: string;
 }
 
 export interface ValidationResult {
   valid_count: number;
+  warning_count: number;
   error_count: number;
+  /** Rejection counts per field — a province-wide export rejects its
+   * out-of-area rows by design, and that reads as one line, not thousands. */
+  rejected_by_field: Record<string, number>;
+  standardized_by_field: Record<string, number>;
   errors: ValidationError[];
+  standardizations: Standardization[];
 }
 
 export async function validateUpload(
@@ -175,6 +207,56 @@ export async function downloadCsvReport(filters: IncidentFilters): Promise<void>
   const a = document.createElement('a');
   a.href = url;
   a.download = 'ppalma_incident_report.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+export interface TemporalSplitQuery {
+  cutoff_date: string;
+  source?: 'official' | 'geocoded' | 'generalized' | 'manually_verified';
+  municipality?: string;
+  crime_type?: string;
+  eps_km?: number;
+  min_samples?: number;
+  cell_km?: number;
+}
+
+export interface TemporalSplitResult {
+  cutoff_date: string;
+  dataset_source: string;
+  train_period: { start: string; end: string; incident_count: number };
+  test_period: { start: string; end: string; incident_count: number };
+  eps_km: number;
+  min_samples: number;
+  cell_km: number;
+  train_cluster_count: number;
+  train_noise_count: number;
+  active_unit_count: number;
+  predicted_hotspot_unit_count: number;
+  reference_hotspot_unit_count: number;
+  true_positives: number;
+  false_positives: number;
+  false_negatives: number;
+  true_negatives: number;
+  precision_percent: number;
+  recall_percent: number;
+  f1_score_percent: number;
+  predictions_csv: string;
+  reference_csv: string;
+  methodology: string;
+}
+
+export async function runTemporalSplitEvaluation(query: TemporalSplitQuery): Promise<TemporalSplitResult> {
+  const res = await apiClient.post('/api/reports/evaluation/temporal-split', query);
+  return res.data;
+}
+
+export function downloadCsvText(content: string, filename: string) {
+  const blob = new Blob([content], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
 }

@@ -81,16 +81,15 @@ export function DashboardPage() {
       <div>
         <h1 className="text-xl font-bold text-slate-900">Dashboard</h1>
         <p className="text-sm text-slate-500">
-          Summary of {summary.synthetic_incidents} synthetic and {summary.pnp_incidents} official
-          PNP records across {summary.municipality_count} PPALMA municipalities,{' '}
+          Summary of {summary.official_incidents} official PNP records across{' '}
+          {summary.municipality_count} PPALMA municipalities,{' '}
           {summary.distinct_year_count} analyzed years.
         </p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <StatCard label="Total incidents" value={summary.total_incidents} />
-        <StatCard label="Synthetic (dev) records" value={summary.synthetic_incidents} />
-        <StatCard label="Official PNP records" value={summary.pnp_incidents} />
+        <StatCard label="Official PNP records" value={summary.official_incidents} />
         <StatCard label="Municipalities analyzed" value={summary.municipality_count} />
         <StatCard label="Years analyzed" value={summary.distinct_year_count} />
         <StatCard label="Active persistent hotspots" value={summary.active_persistent_hotspots} />

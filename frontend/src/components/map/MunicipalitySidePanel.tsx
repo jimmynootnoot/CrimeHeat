@@ -15,7 +15,7 @@ export function MunicipalitySidePanel({
   onClose: () => void;
 }) {
   return (
-    <DetailDrawer title={name} subtitle="Municipality summary" onClose={onClose}>
+    <DetailDrawer title={name} subtitle="Municipality overview · all years and crime types" onClose={onClose}>
       {loading && (
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">

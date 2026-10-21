@@ -1,5 +1,4 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { DevModeBanner } from './components/DevModeBanner';
 import { NavBar } from './components/NavBar';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { useAuth } from './context/AuthContext';
@@ -14,7 +13,6 @@ function AppLayout() {
   const { isAuthenticated } = useAuth();
   return (
     <div className="flex flex-col h-full">
-      <DevModeBanner />
       {isAuthenticated && <NavBar />}
       <div className="flex-1 min-h-0">
         <Routes>

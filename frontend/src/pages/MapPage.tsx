@@ -8,11 +8,12 @@ import { MunicipalitySidePanel } from '../components/map/MunicipalitySidePanel';
 import { ClusterDetailPanel } from '../components/map/ClusterDetailPanel';
 import { PersistenceDetailPanel } from '../components/map/PersistenceDetailPanel';
 import { MapLegend } from '../components/map/MapLegend';
+import { AnalysisSummary } from '../components/map/AnalysisSummary';
 import { ErrorState } from '../components/ui/ErrorState';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import {
   fetchBarangays,
-  fetchDashboardSummary,
+  fetchIncidentSummary,
   fetchMunicipalityStats,
   fetchYearsAvailable,
 } from '../api/endpoints';
@@ -39,6 +40,8 @@ const DEFAULT_LAYERS: MapLayerVisibility = {
   boundaries: true,
   incidents: true,
   clusters: true,
+  core: true,
+  border: true,
   noise: true,
   persistence: true,
   heatmap: false,
@@ -70,9 +73,27 @@ export function MapPage() {
   const [layerVisibility, setLayerVisibility] = useState<MapLayerVisibility>(DEFAULT_LAYERS);
   const [years, setYears] = useState<number[]>([]);
   const [barangays, setBarangays] = useState<string[]>([]);
-  const [incidentCounts, setIncidentCounts] = useState<Record<string, number>>({});
+  const countScope = JSON.stringify([
+    debouncedFilters.municipality,
+    debouncedFilters.barangay,
+    debouncedFilters.crime_type,
+    mode === 'persistence' ? 'all' : debouncedFilters.year,
+  ]);
+  const [incidentSummary, setIncidentSummary] = useState<{
+    scope: string;
+    municipality_breakdown: Record<string, number>;
+    bounds: [number, number, number, number] | null;
+    focus: [number, number] | null;
+  } | null>(null);
+  const summaryReady = incidentSummary?.scope === countScope;
+  const incidentCounts = summaryReady ? incidentSummary.municipality_breakdown : null;
+  const filteredIncidentBounds = summaryReady ? incidentSummary.bounds : null;
+  const barangayFocus = summaryReady ? incidentSummary.focus : null;
   const [metadata, setMetadata] = useState<AnalysisMetadata>({});
   const [loadError, setLoadError] = useState(false);
+  const [layerLoading, setLayerLoading] = useState(false);
+  const [layerError, setLayerError] = useState<string | null>(null);
+  const [analysisRevision, setAnalysisRevision] = useState(0);
 
   const [selection, setSelection] = useState<Selection>(null);
   const [municipalityStats, setMunicipalityStats] = useState<MunicipalityStats | null>(null);
@@ -80,10 +101,39 @@ export function MapPage() {
 
   useEffect(() => {
     fetchYearsAvailable().then(setYears).catch(() => setYears([]));
-    fetchDashboardSummary()
-      .then((summary) => setIncidentCounts(summary.municipality_breakdown))
-      .catch(() => setLoadError(true));
   }, []);
+
+  // Persistence spans every analyzed year. Its category filter selects chains,
+  // while boundary counts describe the underlying incident scope.
+  const countYear = mode === 'persistence' || debouncedFilters.year === 'all' ? undefined : debouncedFilters.year;
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoadError(false);
+    fetchIncidentSummary({
+      municipality: debouncedFilters.municipality || undefined,
+      barangay: debouncedFilters.barangay || undefined,
+      crime_type: debouncedFilters.crime_type || undefined,
+      year: countYear,
+    }, controller.signal)
+      .then((summary) => {
+        if (!controller.signal.aborted) {
+          setIncidentSummary({
+            scope: countScope,
+            municipality_breakdown: summary.municipality_breakdown,
+            bounds: summary.bounds,
+            focus: summary.focus,
+          });
+        }
+      })
+      .catch(() => { if (!controller.signal.aborted) setLoadError(true); });
+    return () => controller.abort();
+  }, [debouncedFilters.municipality, debouncedFilters.barangay, debouncedFilters.crime_type, countYear, countScope]);
+
+  useEffect(() => {
+    setSelection(null);
+    setMetadata({});
+    setLayerError(null);
+  }, [mode, filters.municipality, filters.barangay, filters.crime_type, filters.year, filters.persistence_category, debouncedFilters, analysisRevision]);
 
   useEffect(() => {
     localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(filters));
@@ -94,7 +144,12 @@ export function MapPage() {
       setBarangays([]);
       return;
     }
-    fetchBarangays(filters.municipality).then(setBarangays).catch(() => setBarangays([]));
+    let active = true;
+    setBarangays([]);
+    fetchBarangays(filters.municipality)
+      .then((items) => { if (active) setBarangays(items); })
+      .catch(() => { if (active) setBarangays([]); });
+    return () => { active = false; };
   }, [filters.municipality]);
 
   function handleMunicipalityClick(name: string) {
@@ -129,15 +184,34 @@ export function MapPage() {
         filters={debouncedFilters}
         layerVisibility={layerVisibility}
         activeMunicipality={selection?.kind === 'municipality' ? selection.name : null}
+        selectedClusterId={selection?.kind === 'cluster' ? selection.props.cluster_id : null}
+        analysisRevision={analysisRevision}
         incidentCounts={incidentCounts}
+        filteredIncidentBounds={filteredIncidentBounds}
+        barangayFocus={barangayFocus}
+        localityBoundsReady={summaryReady}
         onMunicipalityClick={handleMunicipalityClick}
         onSelectCluster={(props) => setSelection({ kind: 'cluster', props })}
         onSelectPersistence={(props) => setSelection({ kind: 'persistence', props })}
-        onMetadata={(meta) => setMetadata((prev) => ({ ...prev, ...meta }))}
+        onMetadata={setMetadata}
+        onLoadingChange={setLayerLoading}
+        onError={setLayerError}
       />
 
-      <div className="absolute top-3 left-3 z-[900] flex flex-col gap-3">
+      {layerLoading && (mode === 'cluster' || mode === 'persistence') && (
+        <div className="absolute top-3 left-1/2 z-[1000] -translate-x-1/2 rounded-full bg-slate-900/90 px-4 py-1.5 text-sm text-white shadow-lg">
+          {mode === 'cluster' ? 'Computing DBSCAN clusters…' : 'Computing persistence chains…'}
+        </div>
+      )}
+
+      {/* The control stack can be taller than the viewport (filters + timeline
+          + layers + legend). Cap it to the map area and let it scroll on its
+          own, so the bottom panels stay reachable on short screens instead of
+          being clipped off the edge. `overscroll-contain` stops the scroll
+          from chaining out to the page once the stack hits its end. */}
+      <div className="absolute top-3 left-3 z-[900] flex max-h-[calc(100%-1.5rem)] flex-col gap-3 overflow-y-auto overscroll-contain pr-1 pb-1">
         <ModeToggle mode={mode} onChange={setMode} />
+        {mode === 'cluster' && <AnalysisSummary metadata={metadata} loading={layerLoading || filters !== debouncedFilters} error={layerError} onRetry={() => setAnalysisRevision((v) => v + 1)} />}
         <FilterPanel mode={mode} filters={filters} onChange={setFilters} barangays={barangays} metadata={metadata} />
         {(mode === 'incident' || mode === 'cluster') && (
           <TimelineControl
@@ -147,7 +221,7 @@ export function MapPage() {
           />
         )}
         <LayerControl mode={mode} visibility={layerVisibility} onChange={setLayerVisibility} />
-        <MapLegend mode={mode} filters={filters} />
+        <MapLegend mode={mode} filters={filters} visibility={layerVisibility} />
       </div>
 
       {selection?.kind === 'municipality' && (

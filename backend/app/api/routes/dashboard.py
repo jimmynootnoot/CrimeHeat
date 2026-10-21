@@ -19,8 +19,7 @@ def dashboard_summary(db: Session = Depends(get_db), _=Depends(get_current_user)
     settings = get_settings()
 
     total = db.query(Incident).count()
-    synthetic = db.query(Incident).filter(Incident.source == "synthetic").count()
-    pnp = db.query(Incident).filter(Incident.source == "pnp").count()
+    official = db.query(Incident).filter(Incident.source == "official").count()
 
     crime_type_breakdown = dict(
         db.query(Incident.crime_type, func.count(Incident.id)).group_by(Incident.crime_type).all()
@@ -49,9 +48,7 @@ def dashboard_summary(db: Session = Depends(get_db), _=Depends(get_current_user)
         whole_dataset = run_dbscan(
             db, eps_km=settings.dbscan_eps_km, min_samples=settings.dbscan_min_samples
         )
-        feature_count = len(whole_dataset["features"])
-        noise_count = sum(1 for f in whole_dataset["features"] if f["properties"]["status"] == "noise")
-        noise_ratio = round(noise_count / feature_count, 4) if feature_count else 0.0
+        noise_ratio = whole_dataset["metadata"]["noise_ratio"]
 
     latest_run_at = db.query(func.max(DBSCANRun.created_at)).scalar()
     latest_persistence_at = db.query(func.max(PersistenceRecord.created_at)).scalar()
@@ -60,8 +57,7 @@ def dashboard_summary(db: Session = Depends(get_db), _=Depends(get_current_user)
 
     return {
         "total_incidents": total,
-        "synthetic_incidents": synthetic,
-        "pnp_incidents": pnp,
+        "official_incidents": official,
         "crime_type_breakdown": crime_type_breakdown,
         "municipality_breakdown": municipality_breakdown,
         "year_breakdown": year_breakdown,

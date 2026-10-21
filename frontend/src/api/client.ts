@@ -3,7 +3,9 @@ import axios from 'axios';
 // VITE_API_BASE_URL is the current name; VITE_API_URL is accepted as a fallback
 // so an existing local .env keeps working after the rename.
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? import.meta.env.VITE_API_URL ?? 'http://localhost:8000';
+  import.meta.env.VITE_API_BASE_URL ??
+  import.meta.env.VITE_API_URL ??
+  (import.meta.env.DEV ? 'http://localhost:8000' : '');
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -38,15 +40,7 @@ apiClient.interceptors.response.use(
   }
 );
 
-export const DATA_SOURCE = import.meta.env.VITE_DATA_SOURCE ?? 'synthetic';
+export const DATA_SOURCE = import.meta.env.VITE_DATA_SOURCE ?? 'official';
 
 export const APP_NAME =
   import.meta.env.VITE_APP_NAME ?? 'PPALMA Persistent Crime Pattern Analysis Tool';
-
-/** True while the system is running on synthetic data. Drives the
- * demonstration-mode banner. Defaults to ON: if the flag is missing or
- * malformed the safe failure is to show the warning, never to hide it. */
-export const DEMO_MODE =
-  (import.meta.env.VITE_DEMO_MODE ?? '').toString().toLowerCase() === 'false'
-    ? false
-    : DATA_SOURCE === 'synthetic';

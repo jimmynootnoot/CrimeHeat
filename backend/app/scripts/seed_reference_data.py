@@ -1,5 +1,4 @@
-"""Seed reference tables: roles, barangays, configurable settings, and the
-demonstration reference hotspots.
+"""Seed reference tables: roles, barangays, and configurable settings.
 
 Run with: python -m app.scripts.seed_reference_data
 
@@ -10,21 +9,16 @@ left alone (only its label/description/default are refreshed).
 import json
 from pathlib import Path
 
-from geoalchemy2.shape import from_shape
-from shapely.geometry import shape
-
 from app.core.config import get_settings
 from app.db.session import SessionLocal
 from app.models.barangay import Barangay
 from app.models.municipality import Municipality
-from app.models.reference_hotspot import ReferenceHotspot
 from app.models.role import Role
 from app.models.system import SystemSetting
 from app.core.taxonomy import normalize_municipality
 
 DATA_DIR = Path(__file__).resolve().parents[3] / "data"
 BARANGAYS_PATH = DATA_DIR / "boundaries" / "ppalma_barangays.json"
-HOTSPOTS_PATH = DATA_DIR / "synthetic" / "synthetic_reference_hotspots.geojson"
 
 ROLES = [
     (
@@ -256,34 +250,6 @@ def run() -> None:
             db.commit()
             print(f"Seeded {total} barangays.")
 
-        # --- Demonstration reference hotspots ---
-        if not HOTSPOTS_PATH.exists():
-            print("  (skipping reference hotspots — run app.services.synthetic_data first)")
-        else:
-            with open(HOTSPOTS_PATH, encoding="utf-8") as f:
-                collection = json.load(f)
-            db.query(ReferenceHotspot).filter(
-                ReferenceHotspot.label_source == "synthetic_demo"
-            ).delete()
-            for feature in collection.get("features", []):
-                props = feature.get("properties", {})
-                geom = shape(feature["geometry"])
-                db.add(
-                    ReferenceHotspot(
-                        name=props.get("name", "Unnamed reference site"),
-                        municipality=props.get("municipality", ""),
-                        label_source="synthetic_demo",
-                        notes=props.get("notes"),
-                        geom=from_shape(geom, srid=4326),
-                    )
-                )
-            db.commit()
-            count = db.query(ReferenceHotspot).count()
-            print(f"Seeded {count} demonstration reference hotspots.")
-            print(
-                "  NOTE: these are demo-only ground truth. Any F1-score derived from them "
-                "is a demonstration of the evaluation pipeline, not PNP validation."
-            )
     finally:
         db.close()
 

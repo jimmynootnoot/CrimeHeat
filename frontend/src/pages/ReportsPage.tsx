@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { downloadCsvReport, openHtmlReport } from '../api/endpoints';
 import { CRIME_TYPES, PPALMA_MUNICIPALITIES } from '../types';
+import { EvaluationExport } from '../components/EvaluationExport';
+import { TemporalSplitEvaluation } from '../components/TemporalSplitEvaluation';
 
 export function ReportsPage() {
   const [municipality, setMunicipality] = useState('');
@@ -18,8 +20,7 @@ export function ReportsPage() {
       <div>
         <h1 className="text-xl font-bold text-slate-900">Reports</h1>
         <p className="text-sm text-slate-500">
-          Export the currently filtered record set. Reports generated from synthetic data are
-          for development/demonstration only and must not be cited as PNP findings.
+          Export the currently filtered record set from the official PNP dataset.
         </p>
       </div>
 
@@ -76,6 +77,8 @@ export function ReportsPage() {
           </button>
         </div>
       </div>
+      <EvaluationExport />
+      <TemporalSplitEvaluation />
     </div>
   );
 }

@@ -26,13 +26,18 @@ export interface Incident {
   incident_id: string;
   crime_type: string;
   incident_date: string;
+  /** "year_only" means the source supplied no date — incident_date carries a
+   * placeholder day that must never be shown as an observed date. */
+  date_precision?: 'exact' | 'year_only';
   incident_time: string | null;
   municipality: string;
   barangay: string;
   general_location: string | null;
   latitude: number;
   longitude: number;
-  source: 'synthetic' | 'pnp';
+  coordinate_precision?: string | null;
+  /** Provenance of the record: official | geocoded | generalized | manually_verified. */
+  source: string;
 }
 
 export interface IncidentFilters {
@@ -45,17 +50,24 @@ export interface IncidentFilters {
   page_size?: number;
 }
 
+/** DBSCAN's three-way point classification. Extents also retain status=core
+ * for compatibility; use feature_kind or geometry to identify member points. */
+export type ClusterPointStatus = 'core' | 'border' | 'noise';
+
 export interface ClusterFeatureProperties {
   cluster_id: number | null;
   run_id: number;
   year: number | null;
   crime_type: string | null;
   point_count: number;
-  status: 'core' | 'noise';
+  status: ClusterPointStatus;
+  feature_kind?: 'extent' | 'member';
   centroid?: [number, number];
   municipality?: string;
   dominant_crime_type?: string;
   barangays?: string[];
+  core_point_count?: number;
+  border_point_count?: number;
 }
 
 export type PersistenceCategory =
@@ -75,6 +87,11 @@ export interface PersistenceFeatureProperties {
   first_year: number | null;
   latest_year: number | null;
   crime_type: string | null;
+  /** Member incidents across every period — the magnitude behind the score. */
+  incident_count?: number;
+  present_in_latest_period?: boolean;
+  /** "extent" is the hull polygon; "label" the centroid marker. */
+  feature_kind?: 'extent' | 'label';
 }
 
 export interface AnalysisMetadata {
@@ -82,6 +99,15 @@ export interface AnalysisMetadata {
   min_samples?: number;
   match_distance_km?: number;
   persistence_score_threshold?: number;
+  incidents_analyzed?: number;
+  cluster_count?: number;
+  core_point_count?: number;
+  border_point_count?: number;
+  clustered_point_count?: number;
+  noise_point_count?: number;
+  noise_ratio?: number | null;
+  /** Caveats about the current eps / min-samples, e.g. excessive noise. */
+  warnings?: string[];
 }
 
 export type MapMode = 'incident' | 'cluster' | 'persistence';
@@ -99,6 +125,8 @@ export interface MapLayerVisibility {
   boundaries: boolean;
   incidents: boolean;
   clusters: boolean;
+  core: boolean;
+  border: boolean;
   noise: boolean;
   persistence: boolean;
   heatmap: boolean;

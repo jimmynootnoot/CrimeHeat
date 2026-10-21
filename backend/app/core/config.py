@@ -1,7 +1,15 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Anchored to backend/.env rather than a bare ".env", which pydantic-settings
+# resolves against the *current working directory*. With the relative form, a
+# script or server started from the repo root silently found no .env at all and
+# fell back to the localhost defaults below — pointing the app at a different
+# database than the one it uses when started from backend/, with no warning.
+ENV_FILE = Path(__file__).resolve().parents[2] / ".env"
 
 
 class Settings(BaseSettings):
@@ -13,7 +21,7 @@ class Settings(BaseSettings):
     local `.env` keeps working after the rename.
     """
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore", case_sensitive=False)
+    model_config = SettingsConfigDict(env_file=ENV_FILE, extra="ignore", case_sensitive=False)
 
     # Database — same field works for local PostgreSQL/PostGIS or a Supabase Postgres URL.
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/ppalma_crime"
@@ -30,10 +38,9 @@ class Settings(BaseSettings):
     )
 
     # --- Data source ---
-    # Drives the demonstration-mode banner and dataset labeling. Set to "official"
-    # once the PNP dataset has fully replaced the synthetic seed.
-    data_source: str = "synthetic"
-    synthetic_data_enabled: bool = True
+    # Labels imported datasets. The study now runs on the released PNP dataset;
+    # the synthetic demonstration data has been removed.
+    data_source: str = "official"
 
     # --- DBSCAN defaults ---
     # Deliberately configurable, not hardcoded: the values that make sense depend
@@ -60,7 +67,7 @@ class Settings(BaseSettings):
     weight_functional: float = 0.10
 
     # --- Upload limits ---
-    max_upload_size_mb: float = 10.0
+    max_upload_size_mb: float = 100.0
 
     # --- CORS ---
     frontend_origin: str = "http://localhost:5173"

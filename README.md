@@ -5,14 +5,15 @@ Cotabato — **P**ikit, **P**igcawayan, **A**lamada, **L**ibungan, **M**idsayap,
 **A**leosan ("PPALMA"). Built with DBSCAN clustering and cross-year cluster
 matching ("persistence") to surface where reported incidents recur.
 
-## ⚠️ Development Mode — Synthetic Data Only
+## Data
 
-The official PNP crime dataset has been requested but not yet released. This
-codebase currently runs against a **clearly-labeled, fictional synthetic
-dataset** (`data/synthetic/synthetic_incidents.csv`, `source='synthetic'` on
-every row) that mirrors the eventual PNP schema. **Do not cite anything shown
-in this app as an actual PNP finding.** See [Stage 2](#stage-2-official-data-integration)
-below for how the synthetic data gets replaced once the real dataset arrives.
+The tool runs on the official PNP incident dataset, loaded through the Upload
+page (`source='official'`). The synthetic demonstration dataset used before the
+real data was released has been removed; it remains in git history if a
+demonstration fixture is ever needed again.
+
+The importer does the file cleanup so a PNP export can be loaded as-is — see
+[What the importer organizes](#what-the-importer-organizes).
 
 ## Stack
 
@@ -56,9 +57,17 @@ Cotabato province), keeping only the 6 PPALMA `adm3_psgc` codes:
 | Pikit | 1204712000 |
 | Aleosan | 1204717000 |
 
-Barangay names used in the synthetic dataset (attribute text only, no barangay
-geometry) came from the same source's per-municipality barangay files and are
-saved in `data/boundaries/ppalma_barangays.json`.
+Barangay names (attribute text only, no barangay geometry) came from the same
+source's per-municipality barangay files and are saved in
+`data/boundaries/ppalma_barangays.json`. The importer resolves inbound barangay
+spellings against this list.
+
+`data/boundaries/ppalma_barangay_centroids.json` contains municipality-qualified
+polygon centroids for all 146 listed PPALMA barangays. They were extracted from
+the government-derived [PSGC 2026.4.13.0 data package](https://github.com/fish-and-bear/psgc)
+(PSA PSGC Q1 2026 and the GeoRisk Philippines barangay boundary layer, WGS84).
+The map uses these centroids to focus a barangay filter; it does not infer a
+barangay's location from incident coordinates.
 
 ## Local setup
 
@@ -82,10 +91,16 @@ py -m venv venv
 copy .env.example .env   # edit DATABASE_URL / JWT_SECRET as needed
 .\venv\Scripts\python -m alembic upgrade head
 .\venv\Scripts\python -m app.scripts.seed_municipalities
-.\venv\Scripts\python -m app.services.synthetic_data   # regenerate the CSV (optional, already committed)
-.\venv\Scripts\python -m app.scripts.seed_synthetic
+.\venv\Scripts\python -m app.scripts.seed_reference_data  # roles, barangays, configurable settings
 .\venv\Scripts\python -m app.scripts.seed_user          # creates analyst@ppalma.local / ppalma-dev-2026 as an admin
 .\venv\Scripts\python -m uvicorn app.main:app --reload --port 8000
+```
+
+Incident data is then loaded through the Upload page. If a database still holds
+synthetic records from an earlier run, clear them once with:
+
+```powershell
+.\venv\Scripts\python -m app.scripts.purge_synthetic
 ```
 
 API docs: http://localhost:8000/docs
@@ -102,6 +117,25 @@ npm run dev
 App: http://localhost:5173 — log in with `analyst@ppalma.local` / `ppalma-dev-2026`
 (this seeded account is granted the `admin` role — see [Roles](#roles-access-control) below).
 
+## Vercel deployment
+
+The root `vercel.json` deploys the Vite frontend and FastAPI backend as one
+same-origin application. Set these environment variables in the Vercel project
+before using database-backed features:
+
+- `DATABASE_URL` — a reachable PostgreSQL/PostGIS connection string
+- `JWT_SECRET_KEY` — a long, random production secret
+- `DATA_SOURCE=official`
+
+Optional analysis settings use the same names documented below and in
+`backend/.env.example`. The frontend uses `/api` on the deployed origin, so a
+separate public API URL or CORS configuration is not required.
+
+Deploy from the repository root with `vercel --prod`, or import this GitHub
+repository into Vercel. The deployment packages the boundary/reference data
+needed by the API but excludes tests, migrations, and evaluation fixtures from
+the serverless function bundle.
+
 ## Analysis parameters (configurable, not hardcoded)
 
 Set in `backend/.env` (see `backend/app/core/config.py`):
@@ -116,9 +150,9 @@ Set in `backend/.env` (see `backend/app/core/config.py`):
 - `PERSISTENCE_SCORE_THRESHOLD` — the persistence-score cutoff (default
   `0.5`) that separates "intermittent" from "persistent" — see below.
 
-These are deliberately left tunable — the values that make sense for the real
-dataset depend on its true spatial density and time span, which won't be known
-until Stage 2.
+These are deliberately left tunable — the values that make sense depend on the
+loaded dataset's true spatial density and time span, so they are recalibrated
+against the PNP data rather than fixed in code.
 
 ## Persistence score and categories
 
@@ -187,32 +221,48 @@ the script. JWTs expire after `JWT_EXPIRE_MINUTES` (default 12 hours).
   neither is DBSCAN output, and both are labeled as such in the map legend.
 - Victim/suspect identities are never stored or displayed; the incident schema
   has no such fields.
-- Crime types, locations, and dates in the synthetic dataset are fictional.
+- Records placed at a barangay centroid (because exact coordinates were not
+  released) are labeled `barangay_level` precision — their cluster placement is
+  approximate to the barangay, not the exact incident location.
 
-## Stage 2: Official-data integration
+## What the importer organizes
 
-Once the PNP dataset is received:
+A PNP export can be uploaded as it was received — the system performs the
+cleanup that would otherwise be done by hand in Excel, and reports every change
+in the import summary rather than applying it silently
+(`backend/app/services/import_service.py`):
 
-1. Inspect its columns and formats.
-2. Map the PNP fields to the system schema (reuse `backend/app/services/import_service.py`
-   and the Upload page's column-mapping UI — this is exactly what they're for).
-3. Validate data completeness via the same validation step (file type/size,
-   intra-file duplicate IDs, and crime-type taxonomy checks all run
-   automatically — see `KNOWN_CRIME_TYPES` in `import_service.py`).
-4. Identify missing latitude/longitude.
-5. Determine whether geocoding is necessary and ethically permitted.
-6. Confirm the available study years.
-7. Recalibrate `DBSCAN_EPS_KM` / `DBSCAN_MIN_SAMPLES` for the real data's density.
-8. Finalize `PERSISTENCE_MATCH_DISTANCE_KM` / `PERSISTENCE_SCORE_THRESHOLD`.
-9. Set `DATA_SOURCE=pnp` (backend `.env`) and `VITE_DATA_SOURCE=pnp` (frontend
-   `.env`) — the "Development Mode" banner disappears automatically, and new
-   imports are tagged `source='pnp'` instead of `source='synthetic'`.
-10. Replace synthetic demonstrations with official analytical results; do not
-    mix synthetic and PNP records in any published finding.
+| Inbound problem | What the system does |
+|---|---|
+| Header names vary (`Blotter Entry No`, `City/Municipality`, `Nature of Offense`) | Auto-mapped to schema fields by synonym; the operator can override any mapping |
+| Barangay spelled `BRGY. BALABAK`, `Brgy Balabak`, `Sitio Maligaya, Balabak` | Resolved to the official PSGC name (`Balabak`) |
+| `Poblacion I` vs `Poblacion 1` | Roman and Arabic numerals resolve to the same barangay |
+| `Pigkawayan` / `PIKIT` / `Physical Injuries` | Standardized to `Pigcawayan` / `Pikit` / `Physical Injury` |
+| Latitude/longitude blank or unreadable | Placed at the barangay's official centroid, tagged `coordinate_source='barangay_centroid'`, `coordinate_precision='barangay_level'` |
+| Coordinate transposed or outside the study area | Replaced with the barangay centroid where one resolves; rejected only when no usable location remains |
+| Barangay blank | Recovered from the coordinate (nearest official barangay centroid in that municipality) |
+| Reference number blank | Assigned a deterministic id (`B<batch>-000123`) so the row is not lost |
+| Ambiguous numeric dates (`05/03/2024`) | Column read in the order the file itself proves — one `25/12` value makes the whole column day-first; if nothing settles it, those rows are flagged instead of quietly guessed |
+| Offense outside the eight index crimes | Rejected, never bucketed into "Other", so the index-crime analysis stays intact |
 
-No architectural changes are required for this switch — the schema, import
-pipeline, clustering, and persistence services are all source-agnostic and
-already keyed off the `source` column.
+Worksheets (`.xlsx`, `.xls`) are handled as first-class input alongside CSV:
+
+| Worksheet quirk | What the system does |
+|---|---|
+| Real Excel date/time cells | Read as dates, not as epoch numbers (the naive path turns every date into 1970 and rejects the whole file) |
+| Title block above the header (`Republic of the Philippines`, unit name, blank row) | Header row located automatically; the preamble is skipped |
+| One tab per year or per municipality | Tabs sharing the same columns are combined into one dataset, and the combined tabs are named in the import summary |
+| A cover sheet or legend tab | Left out — reported by name rather than mangled into the table |
+| Trailing blank rows and unnamed columns | Dropped |
+
+Coordinates are **optional**: the PNP data-sharing agreement allows releasing
+barangay-level location when exact coordinates cannot be given, so a row with a
+resolvable barangay is always placeable. Rows placed at a centroid are labeled
+as such, and that label is visible in the records table and the map.
+
+After loading real data, recalibrate `DBSCAN_EPS_KM` / `DBSCAN_MIN_SAMPLES` for
+its actual spatial density, and confirm `PERSISTENCE_MATCH_DISTANCE_KM` /
+`PERSISTENCE_SCORE_THRESHOLD` against the available study years.
 
 ## Deferred features
 
@@ -281,8 +331,9 @@ backend/
     db/          SQLAlchemy engine/session
     models/      SQLAlchemy + GeoAlchemy2 models
     api/routes/  auth, municipalities, incidents, upload, clusters, persistence, reports, dashboard
-    services/    synthetic_data, import_service (reusable CSV/XLSX import), clustering, persistence_service
-    scripts/     seed_municipalities, seed_synthetic, seed_user
+    services/    import_service (CSV/XLSX import + auto-organizing), clustering,
+                 persistence_service, locality, evaluation_report, temporal_split_evaluation
+    scripts/     seed_municipalities, seed_reference_data, seed_user, purge_synthetic
   migrations/    Alembic
 frontend/
   src/
@@ -292,6 +343,8 @@ frontend/
     components/ui/   ConfirmDialog, Skeleton, Tooltip, EmptyState, ErrorState
     api/         axios client + typed endpoint functions
 data/
-  boundaries/    ppalma_municipalities.geojson, ppalma_barangays.json
-  synthetic/     synthetic_incidents.csv
+  boundaries/    ppalma_municipalities.geojson, ppalma_barangays.json,
+                 ppalma_barangay_centroids.json
+  evaluation_demo/  sample evaluation-export fixture
+  templates/     crime_import_template.csv
 ```

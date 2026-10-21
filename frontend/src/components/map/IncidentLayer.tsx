@@ -4,6 +4,8 @@ import L from 'leaflet';
 import 'leaflet.markercluster';
 import { fetchIncidents } from '../../api/endpoints';
 import type { Incident, MapFilterState } from '../../types';
+import { locationIcon } from './locationIcon';
+import { formatIncidentDate } from '../../utils/incidentDate';
 
 const CRIME_COLORS: Record<string, string> = {
   Theft: '#f59e0b',
@@ -32,9 +34,11 @@ function dotIcon(color: string) {
 export function IncidentLayer({
   filters,
   onIncidentsLoaded,
+  showMarkers = true,
 }: {
   filters: MapFilterState;
   onIncidentsLoaded?: (incidents: Incident[]) => void;
+  showMarkers?: boolean;
 }) {
   const map = useMap();
   const [incidents, setIncidents] = useState<Incident[]>([]);
@@ -68,19 +72,27 @@ export function IncidentLayer({
   }, [filters.municipality, filters.barangay, filters.crime_type, filters.year]);
 
   useEffect(() => {
-    if (loading) return;
-    const group = L.markerClusterGroup({ maxClusterRadius: 40, disableClusteringAtZoom: 15 });
+    if (loading || !showMarkers) return;
+    const group = L.markerClusterGroup({
+      maxClusterRadius: 48,
+      disableClusteringAtZoom: 15,
+      showCoverageOnHover: false,
+      iconCreateFunction: (cluster) => locationIcon(
+        String(cluster.getChildCount()), '#475569', `${cluster.getChildCount()} nearby incidents. Zoom in to explore.`
+      ),
+    });
 
     incidents.forEach((incident) => {
       const marker = L.marker([incident.latitude, incident.longitude], {
         icon: dotIcon(CRIME_COLORS[incident.crime_type] ?? '#64748b'),
       });
+      const shownDate = formatIncidentDate(incident);
       marker.bindPopup(
-        `<div style="font-size:13px"><b>${incident.crime_type}</b><br/>${incident.incident_date} ${
-          incident.incident_time ?? ''
-        }<br/>${incident.barangay}, ${incident.municipality}<br/>` +
+        `<div style="font-size:13px"><b>${incident.crime_type}</b><br/>${shownDate.label}${
+          shownDate.approximate ? ' <span style="color:#94a3b8">(year only)</span>' : ''
+        } ${incident.incident_time ?? ''}<br/>${incident.barangay}, ${incident.municipality}<br/>` +
           (incident.general_location ? `<span style="color:#64748b">${incident.general_location}</span><br/>` : '') +
-          `<span style="color:#b45309;font-size:11px">Synthetic record — ${incident.incident_id}</span></div>`
+          `<span style="color:#64748b;font-size:11px">${incident.incident_id}</span></div>`
       );
       group.addLayer(marker);
     });
@@ -89,7 +101,7 @@ export function IncidentLayer({
     return () => {
       map.removeLayer(group);
     };
-  }, [map, incidents, loading]);
+  }, [map, incidents, loading, showMarkers]);
 
   return null;
 }
