@@ -4,7 +4,7 @@
   "functions": {
     "api/index.py": {
       "includeFiles": "{backend/**,data/**,frontend/dist/**}",
-      "excludeFiles": "{backend/tests/**,backend/migrations/**,data/evaluation_demo/**,**/__pycache__/**,**/*.pyc}",
+      "excludeFiles": "{backend/.env,frontend/.env,backend/tests/**,backend/migrations/**,data/evaluation_demo/**,**/__pycache__/**,**/*.pyc}",
       "maxDuration": 300
     }
   }
