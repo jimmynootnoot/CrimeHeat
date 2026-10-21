@@ -16,6 +16,10 @@ settings = get_settings()
 engine_options: dict = {"pool_pre_ping": True}
 if os.getenv("VERCEL"):
     engine_options["poolclass"] = NullPool
+    # Supabase transaction pooling does not support session-scoped prepared
+    # statements. Psycopg otherwise begins preparing frequently used queries
+    # automatically after its default threshold.
+    engine_options["connect_args"] = {"prepare_threshold": None}
 
 engine = create_engine(settings.database_url, **engine_options)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
