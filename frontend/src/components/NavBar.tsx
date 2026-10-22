@@ -6,8 +6,8 @@ import { ROLE_LABELS, type UserRole } from '../types';
 const links = [
   { to: '/dashboard', label: 'Dashboard', roles: ['pnp_personnel', 'admin'] },
   { to: '/map', label: 'Map', roles: ['pnp_personnel', 'admin'] },
-  { to: '/records', label: 'Incident Records', roles: ['pnp_personnel', 'admin'] },
-  { to: '/upload', label: 'Import Records', roles: ['pnp_personnel', 'admin'] },
+  { to: '/records', label: 'View Records', roles: ['pnp_personnel', 'admin'] },
+  { to: '/upload', label: 'Import Data', roles: ['pnp_personnel', 'admin'] },
   { to: '/reports', label: 'Generate Reports', roles: ['pnp_personnel', 'admin'] },
   { to: '/admin', label: 'Manage Users', roles: ['admin'] },
 ];
