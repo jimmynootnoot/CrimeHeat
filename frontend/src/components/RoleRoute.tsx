@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useAuth } from '../context/AuthContext';
-import type { UserRole } from '../types';
+import { ROLE_LABELS, type UserRole } from '../types';
 
 export function RoleRoute({
   children,
@@ -20,7 +20,7 @@ export function RoleRoute({
           </div>
           <h1 className="text-lg font-bold text-slate-900">Access restricted</h1>
           <p className="mt-2 text-sm text-slate-600">
-            Your {user?.role ?? 'current'} account does not have permission to use this area.
+            Your {user ? ROLE_LABELS[user.role] : 'current'} account does not have permission to use this area.
           </p>
         </div>
       </div>

@@ -7,7 +7,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app.api.deps import ADMIN_ONLY, ANALYST_OR_ADMIN, get_current_user, require_role
+from app.api.deps import PNP_PERSONNEL_OR_ADMIN, get_current_user, require_role
 from app.core.config import get_settings
 from app.core.taxonomy import CANONICAL_MUNICIPALITIES, INDEX_CRIME_TYPES
 from app.db.session import get_db
@@ -100,7 +100,7 @@ async def preview_upload(
     request: Request,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
-    user: User = Depends(require_role(*ANALYST_OR_ADMIN)),
+    user: User = Depends(require_role(*PNP_PERSONNEL_OR_ADMIN)),
 ):
     if not file.filename or not file.filename.lower().endswith(ALLOWED_EXTENSIONS):
         raise HTTPException(400, f"Unsupported file type. Accepted: {', '.join(ALLOWED_EXTENSIONS)}")
@@ -164,7 +164,7 @@ def validate_batch(
     body: MappingRequest,
     request: Request,
     db: Session = Depends(get_db),
-    user: User = Depends(require_role(*ANALYST_OR_ADMIN)),
+    user: User = Depends(require_role(*PNP_PERSONNEL_OR_ADMIN)),
 ):
     batch = db.query(ImportBatch).filter(ImportBatch.id == batch_id).first()
     if not batch:
@@ -233,7 +233,7 @@ def commit_batch(
     body: MappingRequest,
     request: Request,
     db: Session = Depends(get_db),
-    user: User = Depends(require_role(*ADMIN_ONLY)),
+    user: User = Depends(require_role(*PNP_PERSONNEL_OR_ADMIN)),
 ):
     batch = db.query(ImportBatch).filter(ImportBatch.id == batch_id).first()
     if not batch:

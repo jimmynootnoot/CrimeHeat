@@ -1,7 +1,6 @@
 import { useState, useRef, type ChangeEvent, type DragEvent } from 'react';
 import axios from 'axios';
 import { ColumnMappingForm } from '../components/upload/ColumnMappingForm';
-import { useAuth } from '../context/AuthContext';
 import {
   commitUpload,
   downloadErrorsCsv,
@@ -62,7 +61,6 @@ function StepIndicator({ step }: { step: Step }) {
 }
 
 export function UploadPage() {
-  const { isAdmin, user } = useAuth();
   const [step, setStep] = useState<Step>('select');
   const [fileName, setFileName] = useState<string | null>(null);
   const [preview, setPreview] = useState<UploadPreview | null>(null);
@@ -331,18 +329,10 @@ export function UploadPage() {
             </div>
           )}
 
-          {!isAdmin && (
-            <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
-              Importing requires an admin role. Your account ({user?.role ?? 'analyst'}) can
-              validate files but cannot commit an import.
-            </p>
-          )}
-
           <div className="flex gap-3">
             <button
               onClick={handleCommit}
-              disabled={busy || validation.valid_count === 0 || !isAdmin}
-              title={!isAdmin ? 'Requires an admin role' : undefined}
+              disabled={busy || validation.valid_count === 0}
               className="rounded bg-emerald-700 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
             >
               {busy ? 'Importing…' : `Import ${validation.valid_count} valid rows`}

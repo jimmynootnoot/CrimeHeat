@@ -7,7 +7,7 @@ export function AdminPage() {
   const [users, setUsers] = useState<ManagedUser[]>([]);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<UserRole>('viewer');
+  const [role, setRole] = useState<UserRole>('pnp_personnel');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -34,7 +34,7 @@ export function AdminPage() {
       setUsers((current) => [created, ...current]);
       setEmail('');
       setPassword('');
-      setRole('viewer');
+      setRole('pnp_personnel');
       setSuccess(`${created.email} was created as ${ROLE_LABELS[created.role]}.`);
     } catch (err) {
       const detail = axios.isAxiosError(err) ? err.response?.data?.detail : undefined;
@@ -49,13 +49,13 @@ export function AdminPage() {
       <div className="mx-auto max-w-5xl space-y-6">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-slate-900">Administration</h1>
+            <h1 className="text-xl font-bold text-slate-900">Manage User Accounts</h1>
             <span className="rounded-full bg-amber-200 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-amber-950">
               Administrator only
             </span>
           </div>
           <p className="mt-1 text-sm text-slate-500">
-            Create accounts and assign the least privilege each person needs.
+            Administrator-only access for creating accounts and assigning system roles.
           </p>
         </div>
 

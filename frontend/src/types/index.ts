@@ -181,16 +181,14 @@ export const PPALMA_MUNICIPALITIES = [
   'Pikit',
 ] as const;
 
-export type UserRole = 'viewer' | 'analyst' | 'admin';
+export type UserRole = 'pnp_personnel' | 'admin';
 
 export const ROLE_LABELS: Record<UserRole, string> = {
-  viewer: 'Viewer',
-  analyst: 'Analyst',
+  pnp_personnel: 'PNP Personnel',
   admin: 'Administrator',
 };
 
 export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
-  viewer: 'Read-only access to approved maps, summaries, and reports.',
-  analyst: 'Can upload and validate datasets and run analyses. Cannot manage users or delete data.',
-  admin: 'Full access, including user management, imports, deletions, and analytical parameters.',
+  pnp_personnel: 'Can view the dashboard, map, and incident records; import crime records; and generate reports.',
+  admin: 'Includes all PNP Personnel functions plus user-account management and destructive administrative actions.',
 };

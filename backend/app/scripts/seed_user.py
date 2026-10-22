@@ -2,7 +2,7 @@
 
 Run with: python -m app.scripts.seed_user
 
-Seeds one account per role so the three access levels can be demonstrated and
+Seeds one account per actor so the two access levels can be demonstrated and
 tested without hand-provisioning users. `/api/auth/register` is administrator-
 only, so these are the accounts used to bootstrap a fresh environment.
 
@@ -19,8 +19,8 @@ DEFAULT_PASSWORD = "ppalma-dev-2026"
 # (email, password, role)
 DEMO_ACCOUNTS = [
     (DEFAULT_EMAIL, DEFAULT_PASSWORD, "admin"),
-    ("analyst2@ppalma.local", "ppalma-dev-2026", "analyst"),
-    ("viewer@ppalma.local", "ppalma-dev-2026", "viewer"),
+    ("analyst2@ppalma.local", "ppalma-dev-2026", "pnp_personnel"),
+    ("viewer@ppalma.local", "ppalma-dev-2026", "pnp_personnel"),
 ]
 
 

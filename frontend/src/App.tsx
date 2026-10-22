@@ -2,7 +2,6 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { NavBar } from './components/NavBar';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { RoleRoute } from './components/RoleRoute';
-import { ViewerBanner } from './components/ViewerBanner';
 import { useAuth } from './context/AuthContext';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -17,7 +16,6 @@ function AppLayout() {
   return (
     <div className="flex flex-col h-full">
       {isAuthenticated && <NavBar />}
-      {isAuthenticated && <ViewerBanner />}
       <div className="flex-1 min-h-0">
         <Routes>
           <Route path="/login" element={<LoginPage />} />
@@ -49,7 +47,7 @@ function AppLayout() {
             path="/upload"
             element={
               <ProtectedRoute>
-                <RoleRoute allowed={['analyst', 'admin']}>
+                <RoleRoute allowed={['pnp_personnel', 'admin']}>
                   <UploadPage />
                 </RoleRoute>
               </ProtectedRoute>
@@ -73,7 +71,7 @@ function AppLayout() {
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/map" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </div>
     </div>

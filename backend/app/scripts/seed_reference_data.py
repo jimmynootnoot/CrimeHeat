@@ -27,14 +27,9 @@ ROLES = [
         "analysis runs, system logs, reports, and evaluation.",
     ),
     (
-        "analyst",
-        "Upload and validate datasets, run DBSCAN and persistence analysis, apply "
-        "filters, view results, and export reports. Cannot manage users or delete data.",
-    ),
-    (
-        "viewer",
-        "Read-only: view approved maps, summaries, cluster details, and generated "
-        "reports. Cannot upload, modify, or delete anything.",
+        "pnp_personnel",
+        "View the dashboard, map, and incident records; import crime records; "
+        "run analyses; and generate reports. Cannot manage user accounts.",
     ),
 ]
 

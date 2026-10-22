@@ -7,7 +7,7 @@ from app.db.base import Base
 
 
 class Role(Base):
-    """Reference table for the three study-defined access levels.
+    """Reference table for the two study-defined system actors.
 
     Authorization is enforced in code via `app.api.deps.require_role`; this
     table exists so the User Management screen can present role names and

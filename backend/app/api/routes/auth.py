@@ -3,7 +3,14 @@ from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from app.api.deps import ADMIN_ONLY, ALL_ROLES, get_current_user, require_role
+from app.api.deps import (
+    ADMIN_ONLY,
+    ALL_ROLES,
+    ROLE_PNP_PERSONNEL,
+    get_current_user,
+    normalize_role,
+    require_role,
+)
 from app.core.security import create_access_token, hash_password, verify_password
 from app.db.session import get_db
 from app.models.user import User
@@ -15,7 +22,7 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 class UserCreate(BaseModel):
     email: str = Field(min_length=3, max_length=255)
     password: str = Field(min_length=8, max_length=128)
-    role: str = "viewer"
+    role: str = ROLE_PNP_PERSONNEL
 
 
 def _create_user(db: Session, email: str, password: str, role: str) -> User:
@@ -55,19 +62,20 @@ def login(
         # which accounts exist.
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Incorrect email or password")
 
-    token = create_access_token(subject=user.email, role=user.role)
+    role = normalize_role(user.role)
+    token = create_access_token(subject=user.email, role=role)
     audit_service.record(db, audit_service.LOGIN_SUCCESS, user=user, request=request)
     return {
         "access_token": token,
         "token_type": "bearer",
-        "role": user.role,
+        "role": role,
         "email": user.email,
     }
 
 
 @router.get("/me")
 def me(user: User = Depends(get_current_user)):
-    return {"id": user.id, "email": user.email, "role": user.role}
+    return {"id": user.id, "email": user.email, "role": normalize_role(user.role)}
 
 
 @router.post("/logout")
@@ -87,7 +95,7 @@ def register(
     email: str,
     password: str,
     request: Request,
-    role: str = "viewer",
+    role: str = ROLE_PNP_PERSONNEL,
     db: Session = Depends(get_db),
     actor: User = Depends(require_role(*ADMIN_ONLY)),
 ):
@@ -112,7 +120,7 @@ def register(
         details={"created_email": user.email, "role": user.role},
         request=request,
     )
-    return {"id": user.id, "email": user.email, "role": user.role}
+    return {"id": user.id, "email": user.email, "role": normalize_role(user.role)}
 
 
 @router.get("/users")
@@ -126,7 +134,7 @@ def list_users(
         {
             "id": user.id,
             "email": user.email,
-            "role": user.role,
+            "role": normalize_role(user.role),
             "created_at": user.created_at,
         }
         for user in users
@@ -151,4 +159,9 @@ def create_user(
         details={"created_email": user.email, "role": user.role},
         request=request,
     )
-    return {"id": user.id, "email": user.email, "role": user.role, "created_at": user.created_at}
+    return {
+        "id": user.id,
+        "email": user.email,
+        "role": normalize_role(user.role),
+        "created_at": user.created_at,
+    }

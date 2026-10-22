@@ -4,12 +4,12 @@ import { APP_NAME } from '../api/client';
 import { ROLE_LABELS, type UserRole } from '../types';
 
 const links = [
-  { to: '/dashboard', label: 'Dashboard', roles: ['viewer', 'analyst', 'admin'] },
-  { to: '/map', label: 'Map', roles: ['viewer', 'analyst', 'admin'] },
-  { to: '/records', label: 'Records', roles: ['viewer', 'analyst', 'admin'] },
-  { to: '/upload', label: 'Upload', roles: ['analyst', 'admin'] },
-  { to: '/reports', label: 'Reports', roles: ['viewer', 'analyst', 'admin'] },
-  { to: '/admin', label: 'Administration', roles: ['admin'] },
+  { to: '/dashboard', label: 'Dashboard', roles: ['pnp_personnel', 'admin'] },
+  { to: '/map', label: 'Map', roles: ['pnp_personnel', 'admin'] },
+  { to: '/records', label: 'Incident Records', roles: ['pnp_personnel', 'admin'] },
+  { to: '/upload', label: 'Import Records', roles: ['pnp_personnel', 'admin'] },
+  { to: '/reports', label: 'Generate Reports', roles: ['pnp_personnel', 'admin'] },
+  { to: '/admin', label: 'Manage Users', roles: ['admin'] },
 ];
 
 export function NavBar() {
@@ -43,12 +43,10 @@ export function NavBar() {
             className={`rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide ${
               user.role === 'admin'
                 ? 'bg-amber-300 text-amber-950'
-                : user.role === 'analyst'
-                  ? 'bg-violet-300 text-violet-950'
-                  : 'bg-sky-300 text-sky-950'
+                : 'bg-blue-300 text-blue-950'
             }`}
           >
-            {ROLE_LABELS[user.role as UserRole]}{user.role === 'viewer' ? ' · Read only' : ''}
+            {ROLE_LABELS[user.role as UserRole]}
           </span>
         )}
         <span className="hidden text-slate-400 lg:inline">{user?.email}</span>

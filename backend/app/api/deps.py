@@ -9,18 +9,25 @@ from app.models.user import User
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 # --- Role vocabulary ------------------------------------------------------
-# Ordered least to most privileged. Authorization is checked by explicit
-# membership, not by comparing ranks, so a future non-hierarchical role can be
-# added without silently granting it someone else's permissions.
-ROLE_VIEWER = "viewer"
-ROLE_ANALYST = "analyst"
+# The use-case model has two actors: PNP Personnel and Administrator.
+ROLE_PNP_PERSONNEL = "pnp_personnel"
 ROLE_ADMIN = "admin"
 
-ALL_ROLES = (ROLE_VIEWER, ROLE_ANALYST, ROLE_ADMIN)
+ALL_ROLES = (ROLE_PNP_PERSONNEL, ROLE_ADMIN)
 
-# Roles permitted to upload, validate, and run analyses.
-ANALYST_OR_ADMIN = (ROLE_ANALYST, ROLE_ADMIN)
-# Roles permitted to manage users, delete data, and change analytical parameters.
+# Existing deployments may still contain the former viewer/analyst values.
+# Treat both as PNP Personnel so current accounts continue working while all
+# newly created accounts use the two-role vocabulary from the use-case diagram.
+LEGACY_PNP_ROLES = ("viewer", "analyst")
+
+
+def normalize_role(role: str) -> str:
+    return ROLE_PNP_PERSONNEL if role in LEGACY_PNP_ROLES else role
+
+
+# Both actors can import records, run analyses, and generate reports.
+PNP_PERSONNEL_OR_ADMIN = (ROLE_PNP_PERSONNEL, ROLE_ADMIN)
+# Only administrators can manage users and perform destructive operations.
 ADMIN_ONLY = (ROLE_ADMIN,)
 
 
@@ -44,17 +51,18 @@ def require_role(*roles: str):
     this dependency regardless of what the interface shows.
 
     Typical use:
-        _=Depends(require_role(*ADMIN_ONLY))        # destructive / configuration
-        _=Depends(require_role(*ANALYST_OR_ADMIN))  # upload, run analysis
-        _=Depends(get_current_user)                 # any authenticated user, incl. viewer
+        _=Depends(require_role(*ADMIN_ONLY))                 # user management / deletion
+        _=Depends(require_role(*PNP_PERSONNEL_OR_ADMIN))      # operational functions
+        _=Depends(get_current_user)                           # any authenticated actor
     """
 
     def _check(user: User = Depends(get_current_user)) -> User:
-        if user.role not in roles:
+        normalized_role = normalize_role(user.role)
+        if normalized_role not in roles:
             raise HTTPException(
                 status.HTTP_403_FORBIDDEN,
                 f"This action requires one of these roles: {', '.join(roles)}. "
-                f"Your account has the '{user.role}' role.",
+                f"Your account has the '{normalized_role}' role.",
             )
         return user
 

@@ -194,21 +194,18 @@ instance-to-persistence-chain cross-linking in a single panel is listed under
 
 ## Roles / access control
 
-Every account has a `role` of either `analyst` or `admin`, enforced
+Every account has a `role` of either `pnp_personnel` or `admin`, enforced
 server-side via a `require_role(...)` FastAPI dependency (not just hidden in
 the UI):
 
-- **analyst** (default for new self-registered accounts): can view the
-  dashboard, map, records, and reports, and can preview/validate an upload,
-  but cannot commit an import or delete a record.
-- **admin**: everything an analyst can do, plus committing an upload
-  (`POST /api/upload/{batch_id}/commit`) and deleting incident records
-  (`DELETE /api/incidents/{id}`).
+- **PNP Personnel** (`pnp_personnel`): can log in, view the dashboard, map,
+  and incident records, import crime records, generate reports, and log out.
+- **Admin** (`admin`): all PNP Personnel functions, plus managing user
+  accounts. Destructive record deletion also remains administrator-only.
 
 The seeded demo account (`analyst@ppalma.local`) is granted `admin` so the
-existing demo login can exercise every feature; its role can be changed by
-editing `DEFAULT_ROLE` in `backend/app/scripts/seed_user.py` and re-running
-the script. JWTs expire after `JWT_EXPIRE_MINUTES` (default 12 hours).
+existing demo login can exercise every feature. The other seeded accounts are
+PNP Personnel. JWTs expire after `JWT_EXPIRE_MINUTES` (default 12 hours).
 
 ## What the map does and does not claim
 

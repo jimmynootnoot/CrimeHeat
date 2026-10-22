@@ -13,7 +13,7 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   if (isAuthenticated) {
-    return <Navigate to="/map" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -22,7 +22,7 @@ export function LoginPage() {
     setLoading(true);
     try {
       await login(email, password);
-      navigate('/map');
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 401) {
         setError('Invalid email or password.');

@@ -12,10 +12,9 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   /** Full access: user management, imports, deletions, analytical parameters. */
   isAdmin: boolean;
-  /** Can upload, validate, and run analyses (analyst or admin). */
+  /** Both use-case actors can import records and run analyses. */
   canAnalyze: boolean;
-  /** Read-only account. */
-  isViewer: boolean;
+  isPersonnel: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -24,8 +23,11 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 function readStoredUser(): AuthUser | null {
   const email = localStorage.getItem('user_email');
-  const role = localStorage.getItem('user_role') as UserRole | null;
-  if (!email || !role) return null;
+  const storedRole = localStorage.getItem('user_role');
+  if (!email || !storedRole) return null;
+  // Upgrade sessions created under the former three-role model.
+  const role: UserRole = storedRole === 'admin' ? 'admin' : 'pnp_personnel';
+  localStorage.setItem('user_role', role);
   return { email, role };
 }
 
@@ -42,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     // Fall back to the least-privileged role if the server omits it, so a
     // malformed response can never silently grant elevated access.
-    const role: UserRole = response.data.role ?? 'viewer';
+    const role: UserRole = response.data.role === 'admin' ? 'admin' : 'pnp_personnel';
     localStorage.setItem('access_token', response.data.access_token);
     localStorage.setItem('user_email', normalizedEmail);
     localStorage.setItem('user_role', role);
@@ -70,8 +72,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isAuthenticated: !!user,
         isAdmin: role === 'admin',
-        canAnalyze: role === 'admin' || role === 'analyst',
-        isViewer: role === 'viewer',
+        canAnalyze: !!user,
+        isPersonnel: role === 'pnp_personnel',
         login,
         logout,
       }}

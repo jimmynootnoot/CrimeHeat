@@ -3,10 +3,8 @@ import { downloadCsvReport, openHtmlReport } from '../api/endpoints';
 import { CRIME_TYPES, PPALMA_MUNICIPALITIES } from '../types';
 import { EvaluationExport } from '../components/EvaluationExport';
 import { TemporalSplitEvaluation } from '../components/TemporalSplitEvaluation';
-import { useAuth } from '../context/AuthContext';
 
 export function ReportsPage() {
-  const { canAnalyze } = useAuth();
   const [municipality, setMunicipality] = useState('');
   const [crimeType, setCrimeType] = useState('');
   const [year, setYear] = useState('');
@@ -79,19 +77,8 @@ export function ReportsPage() {
           </button>
         </div>
       </div>
-      {canAnalyze ? (
-        <>
-          <EvaluationExport />
-          <TemporalSplitEvaluation />
-        </>
-      ) : (
-        <div className="rounded-lg border border-sky-200 bg-sky-50 p-4">
-          <h2 className="font-semibold text-sky-950">Evaluation tools are read-only for viewers</h2>
-          <p className="mt-1 text-sm text-sky-800">
-            You can download incident reports above. Running a new evaluation or changing analytical parameters requires an analyst or administrator account.
-          </p>
-        </div>
-      )}
+      <EvaluationExport />
+      <TemporalSplitEvaluation />
     </div>
   );
 }
